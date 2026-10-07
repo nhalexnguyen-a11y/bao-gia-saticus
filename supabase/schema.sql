@@ -56,3 +56,7 @@ do $$ begin
   begin alter publication supabase_realtime add table public.quote_products; exception when others then null; end;
   begin alter publication supabase_realtime add table public.quote_settings; exception when others then null; end;
 end $$;
+
+-- Project này không tự mở quyền API cho bảng mới: cấp quyền cho người dùng đã đăng nhập (RLS ở trên vẫn quyết định chi tiết)
+grant select, insert, update, delete on public.quote_products to authenticated;
+grant select, insert, update on public.quote_settings to authenticated;
