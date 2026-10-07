@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Báo giá SatiCus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: thanh tab trên cùng; tab Tạo báo giá = form bên trái + tờ báo giá xem trước bên phải */
+:root{
+  --bg:#eef2f3; --surface:#ffffff; --line:#d3dcdf; --fg:#17262b; --muted:#5b6f75;
+  --accent:#0f5f6e; --accent-ink:#ffffff; --accent-soft:#dcecef; --danger:#b3402f;
+  --paper:#ffffff; --ink:#1a1a1a; --paper-line:#7a8a8f; --paper-head:#0f5f6e;
+  --f-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-doc:"Tinos","Times New Roman",Times,serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1719; --surface:#172225; --line:#2b3b3f; --fg:#e4eef0; --muted:#97abb0;
+  --accent:#4fb3c4; --accent-ink:#06191d; --accent-soft:#18363c; --danger:#e07a68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1719; --surface:#172225; --line:#2b3b3f; --fg:#e4eef0; --muted:#97abb0;
+  --accent:#4fb3c4; --accent-ink:#06191d; --accent-soft:#18363c; --danger:#e07a68; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding-block:12px}
+.brand{display:flex;flex-direction:column;line-height:1.2}
+.brand b{font-size:17px}
+.brand span{font-size:12px;color:var(--muted)}
+nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav.tabs button{font:inherit;font-weight:500;border:1px solid transparent;background:none;color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--fg)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.banner{margin-top:16px;padding:10px 14px;border-radius:6px;background:var(--accent-soft);font-size:13px;border-left:3px solid var(--danger)}
+.grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:24px;margin-top:20px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{margin:0;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+legend{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);padding:0;margin-bottom:8px}
+.sep{border-top:1px solid var(--line)}
+label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);font-weight:500;min-width:0}
+input,select,textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+input[type=checkbox]{width:auto;accent-color:var(--accent)}
+textarea{resize:vertical;line-height:1.45}
+textarea.code{font-family:var(--f-mono);font-size:12.5px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{text-decoration:none;display:inline-flex;align-items:center;font:inherit;font-weight:600;font-size:13.5px;border-radius:6px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.btn.sm{font-size:12.5px;padding:5px 10px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.status{font-size:12.5px;color:var(--muted);min-height:1.2em;margin:0}
+.status.err{color:var(--danger)}
+.totals{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13px;padding:10px 12px;border-radius:6px;background:var(--accent-soft)}
+.totals b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
+.totals .big{font-weight:700}
+details.box{border:1px solid var(--line);border-radius:6px;padding:8px 12px}
+details.box summary{cursor:pointer;font-size:13px;font-weight:600}
+details.box[open] summary{margin-bottom:10px}
+.scope-q{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto}
+.scope-q .it{display:grid;grid-template-columns:auto minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:13px}
+.scope-q .it span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scope-q .it input.num{padding:4px 6px}
+.scope-q .lbl{font-size:12px;color:var(--muted);font-weight:600;padding-top:4px}
+/* Tờ báo giá xem trước */
+.preview-shell{overflow-x:auto;min-width:0;border-radius:8px;background:var(--line);padding:18px}
+.paper{background:var(--paper);color:var(--ink);font-family:var(--f-doc);font-size:13px;line-height:1.35;width:780px;margin:0 auto;padding:36px 40px 48px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.paper .co{font-weight:700;font-size:16px;color:var(--paper-head)}
+.paper .co-sub{font-size:11.5px;white-space:pre-line}
+.paper .rule{border-bottom:2px solid var(--paper-head);margin:8px 0 14px}
+.paper h1{text-align:center;font-size:20px;letter-spacing:.06em;margin:4px 0 12px}
+.paper .info{display:grid;grid-template-columns:110px 1fr;gap:2px 8px;margin-bottom:10px}
+.paper .info dt{font-weight:700}
+.paper .info dd{margin:0}
+.paper table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+.paper th{background:var(--paper-head);color:#fff;border:1px solid var(--paper-line);padding:5px 4px;font-weight:700}
+.paper td{border-left:1px solid var(--paper-line);border-right:1px solid var(--paper-line);padding:1px 6px;vertical-align:top;overflow-wrap:anywhere}
+.paper tr.first td{border-top:1px solid var(--paper-line);padding-top:5px}
+.paper tr.last td{border-bottom:1px solid var(--paper-line);padding-bottom:5px}
+.paper tr.tot td{border:1px solid var(--paper-line);font-weight:700;padding:4px 6px}
+.paper td.c{text-align:center}.paper td.r{text-align:right;font-variant-numeric:tabular-nums}
+.paper td.pre{white-space:pre-line}
+.paper .hd{font-weight:700;padding-top:6px}
+.paper .ph{color:#9a6b00}
+.paper .words{font-style:italic;margin:6px 0 12px}
+.paper ol.terms{margin:0;padding:0;list-style:none}
+.paper ol.terms li{white-space:pre-line}
+.paper .sign{display:flex;justify-content:flex-end;margin-top:14px}
+.paper .sign div{width:300px;text-align:center;font-weight:700}
+.paper .sign .space{height:80px}
+/* Thư viện */
+.lib{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;margin-top:20px;align-items:start}
+@media (max-width:880px){.lib{grid-template-columns:minmax(0,1fr)}}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.plist li button{all:unset;box-sizing:border-box;display:flex;flex-direction:column;width:100%;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
+.plist li:last-child button{border-bottom:0}
+.plist li button:hover{background:var(--accent-soft)}
+.plist li button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.plist li button[aria-current="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.plist .pm{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.empty{padding:18px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:6px;list-style:none}
+.scope-ed{display:flex;flex-direction:column;gap:10px}
+.sitem{border:1px solid var(--line);border-radius:6px;padding:10px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.sitem .top{display:grid;grid-template-columns:minmax(0,1fr) 80px auto;gap:8px;align-items:end}
+@media (max-width:520px){.sitem .top{grid-template-columns:minmax(0,1fr) 80px}}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--danger);border-radius:6px;font-size:13px}
+code{font-family:var(--f-mono);font-size:12px;background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Đăng nhập */
+.login{min-height:100vh;display:grid;place-items:center;padding-inline:16px}
+.login form{width:100%;max-width:380px}
+.who{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+[hidden]{display:none!important}
+body{margin:0}
+</style>
+</head>
+<body>
+<section class="login" id="loginView" hidden>
+  <form class="panel" id="loginForm" autocomplete="on">
+    <div class="brand"><b>Báo giá SatiCus</b><span>Đăng nhập bằng tài khoản Alex workspace</span></div>
+    <label for="lg-user">Tên đăng nhập<input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+    <label for="lg-pass">Mật khẩu<input id="lg-pass" type="password" autocomplete="current-password" required></label>
+    <div class="btns"><button class="btn primary" type="submit" id="lg-btn">Đăng nhập</button></div>
+    <p class="hint">Dùng cùng tên đăng nhập và mật khẩu với Alex workspace. Quên mật khẩu thì khôi phục trong Alex workspace.</p>
+    <p class="status" id="lg-status" role="status"></p>
+  </form>
+</section>
+<div id="appView" hidden>
+<header class="top"><div class="wrap">
+  <div class="brand"><b>Báo giá SatiCus</b><span>Chọn máy, điền thông tin thương mại, xuất file Excel</span></div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-quote" aria-selected="true" data-tab="quote">Tạo báo giá</button>
+    <button role="tab" id="tab-lib" aria-selected="false" data-tab="lib">Thư viện máy</button>
+    <button role="tab" id="tab-set" aria-selected="false" data-tab="set">Cài đặt</button>
+  </nav>
+  <div class="who"><span id="whoEmail"></span><button class="btn sm" type="button" id="logout">Đăng xuất</button></div>
+</div></header>
+
+<main class="wrap">
+  <div id="dbBanner" class="banner" hidden>Đang kết nối thư viện máy…</div>
+
+  <!-- TẠO BÁO GIÁ -->
+  <section id="view-quote">
+    <div class="grid">
+      <form class="panel" id="quoteForm" autocomplete="off">
+        <fieldset>
+          <legend>Thiết bị</legend>
+          <label for="q-search">Tìm máy (tên, model, hãng)
+            <input id="q-search" type="search" placeholder="Gõ để lọc danh sách">
+          </label>
+          <label for="q-product">Máy báo giá<select id="q-product"></select></label>
+          <div class="row">
+            <label for="q-qty">Số lượng<input id="q-qty" class="num" inputmode="numeric" value="1"></label>
+            <label for="q-price">Đơn giá (VNĐ)<input id="q-price" class="num" inputmode="numeric" placeholder="0"></label>
+            <label for="q-vat">VAT (%)<input id="q-vat" class="num" inputmode="decimal" value="8"></label>
+          </div>
+          <div class="totals" id="q-totals"></div>
+          <details class="box" id="q-scopeBox">
+            <summary>Cấu hình tiêu chuẩn (bỏ chọn hoặc đổi SL cho báo giá này)</summary>
+            <div class="scope-q" id="q-scope"></div>
+          </details>
+        </fieldset>
+        <div class="sep"></div>
+        <fieldset>
+          <legend>Khách hàng</legend>
+          <label for="q-cust">Kính gửi (tên công ty)<input id="q-cust" placeholder="VD: Công ty Cổ phần Dược Hậu Giang"></label>
+          <label for="q-addr">Địa chỉ<input id="q-addr"></label>
+          <div class="row">
+            <label for="q-attn">Người nhận<input id="q-attn"></label>
+            <label for="q-tel">Điện thoại<input id="q-tel"></label>
+          </div>
+          <label for="q-email">Email<input id="q-email"></label>
+          <label for="q-date">Ngày báo giá<input id="q-date" type="date"></label>
+        </fieldset>
+        <div class="sep"></div>
+        <details class="box">
+          <summary>Điều khoản thương mại</summary>
+          <fieldset>
+            <label for="q-terms">Mỗi điều khoản bắt đầu một dòng mới, số thứ tự tự đánh. Dòng bắt đầu bằng <code>-</code> hoặc <code>+</code> là ý con của điều khoản phía trên. <code>{VAT}</code> tự thay bằng mức VAT.
+              <textarea id="q-terms" rows="12"></textarea>
+            </label>
+            <div class="btns"><button type="button" class="btn sm" id="q-resetTerms">Khôi phục điều khoản mặc định</button></div>
+          </fieldset>
+        </details>
+        <div class="btns">
+          <button type="submit" class="btn primary" id="q-export">Xuất file Excel</button>
+          <button type="button" class="btn" id="q-clear">Làm báo giá mới</button>
+        </div>
+        <p class="status" id="q-status" role="status"></p>
+      </form>
+      <div class="preview-shell" aria-label="Xem trước báo giá"><div class="paper" id="paper"></div></div>
+    </div>
+  </section>
+
+  <!-- THƯ VIỆN -->
+  <section id="view-lib" hidden>
+    <div class="lib">
+      <div class="panel">
+        <h2>Máy trong thư viện</h2>
+        <input id="l-search" type="search" placeholder="Lọc theo tên, model, hãng" aria-label="Lọc thư viện">
+        <ul class="plist" id="l-list"></ul>
+        <div class="btns"><button class="btn primary" id="l-new" type="button">Thêm máy mới</button></div>
+        <p class="hint">Cách nhanh nhất: gửi báo giá cũ hoặc catalog cho Claude trong khung chat và nói "thêm vào thư viện báo giá".</p>
+      </div>
+      <form class="panel" id="prodForm" autocomplete="off">
+        <h2 id="p-title">Thêm máy mới</h2>
+        <label for="p-name">Tên máy<input id="p-name" placeholder="VD: Máy Rửa Dụng Cụ"></label>
+        <div class="row">
+          <label for="p-model">Model<input id="p-model"></label>
+          <label for="p-code">Mã đặt hàng<input id="p-code"></label>
+        </div>
+        <div class="row">
+          <label for="p-maker">Nhà sản xuất (NSX)<input id="p-maker"></label>
+          <label for="p-origin">Xuất xứ<input id="p-origin"></label>
+        </div>
+        <label for="p-body">Mô tả kỹ thuật. Dòng bắt đầu bằng <code>#</code> là tiêu đề mục (tự in hoa), mỗi dòng còn lại là một gạch đầu dòng.
+          <textarea id="p-body" class="code" rows="18" placeholder="# Cấu trúc thiết bị&#10;Vỏ máy làm bằng thép không gỉ 304...&#10;# Thông số kỹ thuật&#10;Điện áp & công suất: 220V, 5 kW"></textarea>
+        </label>
+        <div class="sep"></div>
+        <h2>Cấu hình tiêu chuẩn</h2>
+        <p class="hint">Mỗi mục một khung. Mục để trống SL sẽ hiện như dòng nhãn in đậm (VD: "Phụ Kiện Rửa:").</p>
+        <div class="scope-ed" id="p-scope"></div>
+        <div class="btns"><button class="btn sm" type="button" id="p-addScope">Thêm mục</button></div>
+        <div class="sep"></div>
+        <div class="btns">
+          <button class="btn primary" type="submit" id="p-save">Lưu máy</button>
+          <button class="btn" type="button" id="p-use">Dùng để báo giá</button>
+          <button class="btn danger" type="button" id="p-del">Xóa máy</button>
+        </div>
+        <div class="confirm" id="p-confirm" hidden>
+          <span>Xóa máy này khỏi thư viện? Không hoàn tác được.</span>
+          <button class="btn danger sm" type="button" id="p-confirmYes">Xóa</button>
+          <button class="btn sm" type="button" id="p-confirmNo">Hủy</button>
+        </div>
+        <p class="status" id="p-status" role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- CÀI ĐẶT -->
+  <section id="view-set" hidden>
+    <form class="panel" id="setForm" style="max-width:760px;margin-top:20px" autocomplete="off">
+      <h2>Phần đầu báo giá</h2>
+      <label for="s-co">Tên công ty<input id="s-co"></label>
+      <label for="s-hdr">Thông tin văn phòng, liên hệ (in dưới tên công ty)<textarea id="s-hdr" rows="9"></textarea></label>
+      <label for="s-intro">Câu mở đầu trước bảng<textarea id="s-intro" rows="3"></textarea></label>
+      <div class="sep"></div>
+      <h2>Chữ ký và mặc định</h2>
+      <div class="row">
+        <label for="s-signTitle">Chức danh người ký<input id="s-signTitle" placeholder="Để trống nếu không cần"></label>
+        <label for="s-signName">Tên người ký<input id="s-signName" placeholder="Để trống để ký tay"></label>
+      </div>
+      <label for="s-vat">VAT mặc định (%)<input id="s-vat" class="num" inputmode="decimal"></label>
+      <label for="s-terms">Điều khoản mặc định (cùng quy tắc như ở tab Tạo báo giá)<textarea id="s-terms" rows="14"></textarea></label>
+      <div class="btns"><button class="btn primary" type="submit" id="s-save">Lưu cài đặt</button></div>
+      <p class="status" id="s-status" role="status"></p>
+    </form>
+  </section>
+</main>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script>
+/*CORE-START*/
+const DEFAULT_SETTINGS = {
+  companyName: "CÔNG TY TNHH KHOA HỌC VÀ CÔNG NGHỆ SATICUS",
+  header: "", intro: "", signTitle: "", signName: "", vat: 8,
+  terms: "Giá đã bao gồm chi phí vận chuyển nội địa, quốc tế và thuế nhập khẩu.\nThuế GTGT: {VAT}%.\nHàng mới 100% theo tiêu chuẩn nhà sản xuất.\nBảo hành 24 tháng kể từ ngày nghiệm thu.\nHỗ trợ bảo trì, bảo dưỡng sau thời gian bảo hành.\nThời gian giao hàng: 8–12 tuần kể từ ngày nhận tiền cọc.\nBáo giá có giá trị 60 ngày kể từ ngày báo giá."
+};
+const HEAD = "FF0F5F6E", FONT = "Times New Roman";
+
+function parseBody(text){
+  const sections = []; let cur = null;
+  for (const raw of String(text||"").split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    if (line.startsWith("#")) { cur = {title: line.replace(/^#+\s*/, ""), lines: []}; sections.push(cur); }
+    else { if (!cur) { cur = {title: "", lines: []}; sections.push(cur); } cur.lines.push(line); }
+  }
+  return sections;
+}
+function bodyToText(sections){
+  return (sections||[]).map(s => [s.title ? "# " + s.title : null, ...(s.lines||[])].filter(x => x !== null).join("\n")).join("\n");
+}
+/* Dòng mô tả luôn có đúng một gạch đầu dòng; tiêu đề mục in hoa toàn bộ */
+const bullet = l => "- " + String(l).replace(/^\s*[-–•+*]\s*/, "");
+const heading = t => String(t).toLocaleUpperCase("vi");
+function num(v){ const n = Number(String(v??"").replace(/[^\d]/g, "")); return isFinite(n) ? n : 0; }
+function dec(v){ const n = parseFloat(String(v??"").replace(",", ".").replace(/[^\d.]/g, "")); return isFinite(n) ? n : 0; }
+function vnd(n){ return Math.round(n).toLocaleString("vi-VN"); }
+
+const CH = ["không","một","hai","ba","bốn","năm","sáu","bảy","tám","chín"];
+function read3(n, full){
+  const h = Math.floor(n/100), t = Math.floor(n%100/10), u = n%10, s = [];
+  if (full || h > 0) s.push(CH[h] + " trăm");
+  if (t > 1) { s.push(CH[t] + " mươi"); if (u === 1) s.push("mốt"); else if (u === 5) s.push("lăm"); else if (u > 0) s.push(CH[u]); }
+  else if (t === 1) { s.push("mười"); if (u === 5) s.push("lăm"); else if (u > 0) s.push(CH[u]); }
+  else if (u > 0) { if (full || h > 0) s.push("lẻ"); s.push(CH[u]); }
+  return s.join(" ");
+}
+function below1b(n, lead){
+  const g = [Math.floor(n/1e6), Math.floor(n%1e6/1e3), n%1e3], unit = ["triệu","nghìn",""], out = [];
+  let started = lead;
+  g.forEach((v,i) => { if (v > 0) { out.push(read3(v, started) + (unit[i] ? " " + unit[i] : "")); started = true; } });
+  return out.join(" ");
+}
+function words(n){
+  if (n >= 1e9) { const hi = Math.floor(n/1e9), lo = n % 1e9; return words(hi) + " tỷ" + (lo ? " " + below1b(lo, true) : ""); }
+  return below1b(n, false);
+}
+function moneyWords(n){ n = Math.round(n); if (n <= 0) return ""; const w = words(n); return w.charAt(0).toUpperCase() + w.slice(1) + " đồng."; }
+
+function calc(q){
+  const qty = num(q.qty), price = num(q.price), vat = dec(q.vat);
+  const sub = qty * price, tax = Math.round(sub * vat / 100);
+  return {qty, price, vat, sub, tax, total: sub + tax};
+}
+function fmtDate(iso){ if (!iso) return ""; const [y,m,d] = iso.split("-"); return d + "/" + m + "/" + y; }
+function termsList(text, vat){
+  const out = [];
+  String(text||"").split(/\r?\n/).forEach(raw => {
+    const l = raw.trim(); if (!l) return;
+    const t = l.replace(/\{VAT\}/g, String(vat)).replace(/^\d+[.)]\s*/, "");
+    if (/^[-+•]/.test(l) && out.length) out[out.length-1] += "\n   " + t; else out.push(t);
+  });
+  return out.map((t, i) => (i+1) + ". " + t);
+}
+function productHeader(p){ return [p.name || "", "Model: " + (p.model||""), "NSX: " + (p.maker||""), "Xuất xứ: " + (p.origin||"")].join("\n"); }
+function introText(st){
+  return st.intro || ((st.companyName ? st.companyName.replace(/^CÔNG TY TNHH /i, "Công ty TNHH ") : "Chúng tôi") + " trân trọng gửi Quý khách hàng báo giá thiết bị như sau:");
+}
+function fileName(p, q){
+  const clean = s => String(s||"").replace(/[\\/:*?"<>|\n]/g, " ").replace(/\s+/g, " ").trim();
+  const parts = ["Báo giá", (clean(p.name) || "thiết bị") + (p.model ? " " + clean(p.model) : "")];
+  if (clean(q.customer)) parts.push(clean(q.customer));
+  return parts.join(" - ") + ".xlsx";
+}
+/* Ước lượng chiều cao dòng (Excel không tự giãn dòng khi mở file tạo bằng code) */
+function rowHeight(text, widthChars, pt){
+  const per = Math.max(8, Math.floor(widthChars * 1.0));
+  const lines = String(text).split("\n").reduce((a, l) => a + Math.max(1, Math.ceil(l.length / per)), 0);
+  return Math.min(409, Math.max(16, Math.ceil(lines * (pt + 4.2) + 3)));
+}
+/* scope = các mục cấu hình tiêu chuẩn đã lọc theo lựa chọn của báo giá: [{code,text,qty}] */
+function buildWorkbook(ExcelJS, p, q, st, scope){
+  const c = calc(q), W = {A: 6, B: 13, C: 60, D: 7, E: 16, F: 18};
+  const wb = new ExcelJS.Workbook(); wb.creator = st.companyName || "";
+  const ws = wb.addWorksheet("Báo giá", {
+    pageSetup: {paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+      margins: {left: .5, right: .4, top: .5, bottom: .5, header: .3, footer: .3}, horizontalCentered: true},
+    views: [{showGridLines: false}]
+  });
+  ws.columns = Object.keys(W).map(k => ({key: k, width: W[k]}));
+  const thin = {style: "thin", color: {argb: "FF7A8A8F"}};
+  const f = (o={}) => Object.assign({name: FONT, size: 11}, o);
+  let r = 0;
+  const merged = (text, opts={}) => {
+    r++; ws.mergeCells(`A${r}:F${r}`);
+    const cell = ws.getCell(`A${r}`); cell.value = text;
+    cell.font = f(opts.font); cell.alignment = Object.assign({vertical: "middle", wrapText: true}, opts.align);
+    ws.getRow(r).height = opts.height || rowHeight(text, 120, (opts.font && opts.font.size) || 11);
+    return r;
+  };
+
+  // Đầu trang công ty
+  merged(st.companyName || "", {font: {bold: true, size: 14, color: {argb: HEAD}}, height: 22});
+  if (st.header) merged(st.header, {font: {size: 9.5}, height: rowHeight(st.header, 140, 9.5)});
+  ["A","B","C","D","E","F"].forEach(k => { ws.getCell(`${k}${r}`).border = {bottom: {style: "medium", color: {argb: HEAD}}}; });
+  r++; ws.getRow(r).height = 8;
+  merged("BẢNG BÁO GIÁ", {font: {bold: true, size: 16}, align: {horizontal: "center"}, height: 26});
+  r++; ws.getRow(r).height = 6;
+
+  // Thông tin khách hàng
+  [["Kính gửi:", q.customer], ["Địa chỉ:", q.address], ["Người nhận:", q.attn], ["Điện thoại:", q.tel], ["Email:", q.email], ["Ngày:", fmtDate(q.date)]].forEach(([k, v]) => {
+    r++; ws.mergeCells(`A${r}:B${r}`); ws.mergeCells(`C${r}:F${r}`);
+    const a = ws.getCell(`A${r}`); a.value = k; a.font = f({bold: true});
+    const cc = ws.getCell(`C${r}`); cc.value = v || ""; cc.font = f({bold: k === "Kính gửi:"}); cc.alignment = {wrapText: true, vertical: "top"};
+  });
+  r++; ws.getRow(r).height = 6;
+  merged(introText(st), {font: {italic: true}});
+
+  // Bảng
+  r++; ["STT", "Mã đặt hàng", "Mô tả hàng hóa", "SL", "Đơn giá\n(VNĐ)", "Thành tiền\n(VNĐ)"].forEach((t, i) => {
+    const cell = ws.getRow(r).getCell(i+1); cell.value = t;
+    cell.font = f({bold: true, color: {argb: "FFFFFFFF"}}); cell.fill = {type: "pattern", pattern: "solid", fgColor: {argb: HEAD}};
+    cell.alignment = {horizontal: "center", vertical: "middle", wrapText: true}; cell.border = {top: thin, bottom: thin, left: thin, right: thin}; });
+  ws.getRow(r).height = 32;
+
+  const body = [{type: "product", text: productHeader(p)}];
+  (p.sections||[]).forEach(s => { if (s.title) body.push({type: "head", text: heading(s.title)}); (s.lines||[]).forEach(l => body.push({type: "line", text: bullet(l)})); });
+  if (scope.length) {
+    body.push({type: "head", text: "CẤU HÌNH TIÊU CHUẨN"});
+    scope.forEach(it => {
+      const label = it.qty === "" || it.qty == null;
+      body.push(label ? {type: "head", text: it.text} : {type: "scope", text: bullet(it.text), code: it.code, qty: it.qty});
+    });
+  }
+  const firstRow = r + 1;
+  body.forEach((b, i) => {
+    r++; const row = ws.getRow(r);
+    for (let k = 1; k <= 6; k++) {
+      const cell = row.getCell(k);
+      cell.border = {left: thin, right: thin, top: i === 0 ? thin : undefined, bottom: i === body.length - 1 ? thin : undefined};
+      cell.font = f(); cell.alignment = {vertical: "top", wrapText: true};
+    }
+    const C = row.getCell(3); C.value = b.text;
+    if (b.type === "product" || b.type === "head") C.font = f({bold: true});
+    row.height = rowHeight(b.text, W.C, 11) + (b.type === "head" ? 3 : 0);
+    if (b.type === "scope") {
+      row.getCell(2).value = b.code || ""; row.getCell(2).alignment = {horizontal: "center", vertical: "top", wrapText: true};
+      row.getCell(4).value = num(b.qty) || b.qty; row.getCell(4).alignment = {horizontal: "center", vertical: "top"};
+    }
+    if (b.type === "product") {
+      row.getCell(1).value = 1; row.getCell(1).alignment = {horizontal: "center", vertical: "top"};
+      row.getCell(2).value = p.code || ""; row.getCell(2).alignment = {horizontal: "center", vertical: "top", wrapText: true};
+      row.getCell(4).value = c.qty || null; row.getCell(4).alignment = {horizontal: "center", vertical: "top"};
+      row.getCell(5).value = c.price || null; row.getCell(5).numFmt = "#,##0;-#,##0;;";
+      row.getCell(6).value = {formula: `D${r}*E${r}`, result: c.sub}; row.getCell(6).numFmt = "#,##0;-#,##0;;";
+      row.getCell(5).alignment = row.getCell(6).alignment = {horizontal: "right", vertical: "top"};
+    }
+  });
+  const subRow = r + 1;
+  [["Tổng giá trị trước thuế GTGT", `F${firstRow}`, c.sub], [`Thuế GTGT (${c.vat}%)`, `ROUND(F${subRow}*${c.vat}/100,0)`, c.tax], ["Tổng giá trị sau thuế GTGT", `F${subRow}+F${subRow+1}`, c.total]].forEach(([label, formula, val]) => {
+    r++; const row = ws.getRow(r);
+    for (let k = 1; k <= 6; k++) { const cell = row.getCell(k); cell.border = {top: thin, bottom: thin, left: thin, right: thin}; cell.font = f({bold: true}); }
+    ws.mergeCells(`A${r}:E${r}`);
+    row.getCell(1).value = label; row.getCell(1).alignment = {horizontal: "right", vertical: "middle"};
+    row.getCell(6).value = {formula, result: val}; row.getCell(6).numFmt = "#,##0;-#,##0;;";
+    row.getCell(6).alignment = {horizontal: "right", vertical: "middle"}; row.height = 19;
+  });
+  const mw = moneyWords(c.total);
+  if (mw) merged("Bằng chữ: " + mw, {font: {italic: true}});
+
+  // Điều khoản
+  r++; ws.getRow(r).height = 8;
+  merged("CÁC ĐIỀU KHOẢN THƯƠNG MẠI:", {font: {bold: true}});
+  termsList(q.terms, c.vat).forEach(t => merged(t, {align: {vertical: "top"}}));
+
+  // Chữ ký
+  r++; ws.getRow(r).height = 10;
+  const sign = text => { r++; ws.mergeCells(`D${r}:F${r}`); const cell = ws.getCell(`D${r}`); cell.value = text;
+    cell.font = f({bold: true}); cell.alignment = {horizontal: "center", vertical: "middle", wrapText: true}; ws.getRow(r).height = rowHeight(text, 32, 11); };
+  sign(st.companyName || "");
+  if (st.signTitle) sign(st.signTitle);
+  for (let i = 0; i < 6; i++) { r++; ws.getRow(r).height = 16; }
+  sign(st.signName || "");
+  ws.pageSetup.printArea = `A1:F${r}`;
+  return wb;
+}
+/*CORE-END*/
+
+/* ---------- Trạng thái trang ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+let products = new Map(), settings = {...DEFAULT_SETTINGS};
+let sb = null, session = null, canWrite = true, canAdmin = false;
+let scopeSel = [], scopeFor = null;
+let editingId = null, edScope = [];
+
+const LS = {get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } },
+            set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }};
+function today(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10); }
+
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+function showTab(t){
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  ["quote","lib","set"].forEach(v => $("view-" + v).hidden = v !== t);
+  LS.set("bg_tab", t);
+}
+
+/* ---------- Form báo giá ---------- */
+const QF = ["qty","price","vat","cust","addr","attn","tel","email","date","terms"];
+function readQuote(){
+  return {productId: $("q-product").value, qty: $("q-qty").value, price: $("q-price").value, vat: $("q-vat").value,
+    customer: $("q-cust").value.trim(), address: $("q-addr").value.trim(), attn: $("q-attn").value.trim(),
+    tel: $("q-tel").value.trim(), email: $("q-email").value.trim(), date: $("q-date").value, terms: $("q-terms").value};
+}
+function saveDraft(){ LS.set("bg_draft3", {...readQuote(), scopeSel, scopeFor}); }
+const draft = LS.get("bg_draft3") || {};
+$("q-qty").value = draft.qty ?? "1"; $("q-price").value = draft.price ?? ""; $("q-vat").value = draft.vat ?? String(settings.vat);
+$("q-cust").value = draft.customer || ""; $("q-addr").value = draft.address || ""; $("q-attn").value = draft.attn || "";
+$("q-tel").value = draft.tel || ""; $("q-email").value = draft.email || ""; $("q-date").value = draft.date || today();
+$("q-terms").value = draft.terms ?? settings.terms;
+if (draft.scopeFor) { scopeFor = draft.scopeFor; scopeSel = draft.scopeSel || []; }
+
+$("q-price").addEventListener("blur", e => { const n = num(e.target.value); e.target.value = n ? vnd(n) : ""; refresh(); });
+QF.forEach(k => $("q-" + k).addEventListener("input", refresh));
+$("q-product").addEventListener("change", () => { syncScope(true); refresh(); });
+$("q-search").addEventListener("input", () => fillSelect($("q-product").value));
+$("q-resetTerms").addEventListener("click", () => { $("q-terms").value = settings.terms; refresh(); });
+$("q-clear").addEventListener("click", () => {
+  ["cust","addr","attn","tel","email","price"].forEach(k => $("q-" + k).value = ""); $("q-qty").value = "1"; $("q-date").value = today();
+  $("q-terms").value = settings.terms; $("q-vat").value = String(settings.vat); syncScope(true); refresh();
+});
+
+function sortedProducts(){ return [...products.values()].sort((a,b) => (a.name||"").localeCompare(b.name||"", "vi")); }
+function matches(p, q){ q = q.trim().toLowerCase(); return !q || [p.name,p.model,p.maker,p.code].join(" ").toLowerCase().includes(q); }
+function fillSelect(keep){
+  const sel = $("q-product"), q = $("q-search").value, list = sortedProducts().filter(p => matches(p, q));
+  sel.innerHTML = "";
+  if (!products.size) { sel.add(new Option("Thư viện chưa có máy nào", "")); sel.disabled = true; syncScope(false); refresh(); return; }
+  sel.disabled = false;
+  if (!list.length) sel.add(new Option("Không có máy khớp từ khóa", ""));
+  list.forEach(p => sel.add(new Option((p.name || "(chưa đặt tên)") + (p.model ? " — " + p.model : ""), p.id)));
+  if (keep && list.some(p => p.id === keep)) sel.value = keep;
+  syncScope(false); refresh();
+}
+function currentProduct(){ return products.get($("q-product").value) || null; }
+const isLabel = it => it.qty === "" || it.qty == null;
+function syncScope(reset){
+  const p = currentProduct(), items = p?.scope || [];
+  if (!p) { scopeFor = null; scopeSel = []; }
+  else if (reset || scopeFor !== p.id || scopeSel.length !== items.length) { scopeFor = p.id; scopeSel = items.map(it => ({include: true, qty: it.qty ?? ""})); }
+  const box = $("q-scope"); box.innerHTML = "";
+  $("q-scopeBox").hidden = !items.length;
+  items.forEach((it, i) => {
+    const first = (it.text || "").split("\n")[0];
+    if (isLabel(it)) { const d = document.createElement("div"); d.className = "lbl"; d.textContent = first; box.appendChild(d); return; }
+    const d = document.createElement("div"); d.className = "it";
+    d.innerHTML = `<input type="checkbox" id="qs-c${i}" ${scopeSel[i].include ? "checked" : ""}><span title="${esc(it.text)}"><label for="qs-c${i}" style="display:inline;color:var(--fg);font-weight:400">${it.code ? "<b>" + esc(it.code) + "</b> · " : ""}${esc(first)}</label></span><input id="qs-q${i}" class="num" aria-label="Số lượng" value="${esc(scopeSel[i].qty)}">`;
+    d.querySelector("input[type=checkbox]").addEventListener("change", e => { scopeSel[i].include = e.target.checked; refresh(); });
+    d.querySelector("input.num").addEventListener("input", e => { scopeSel[i].qty = e.target.value; refresh(); });
+    box.appendChild(d);
+  });
+}
+function selectedScope(p){
+  return (p?.scope || []).map((it, i) => ({it, s: scopeSel[i] || {include: true, qty: it.qty}}))
+    .filter(x => isLabel(x.it) || x.s.include)
+    .map(x => ({code: x.it.code || "", text: x.it.text || "", qty: isLabel(x.it) ? "" : x.s.qty}));
+}
+
+function refresh(){
+  const q = readQuote(), p = currentProduct(), c = calc(q);
+  $("q-totals").innerHTML = `<span>Trước thuế</span><b>${vnd(c.sub)}</b><span>VAT ${c.vat}%</span><b>${vnd(c.tax)}</b><span class="big">Tổng cộng</span><b class="big">${vnd(c.total)}</b>`;
+  $("q-export").disabled = !p;
+  renderPaper(p, q, c);
+  saveDraft();
+}
+
+function ph(v, label){ return v ? esc(v) : `<span class="ph">[${label}]</span>`; }
+function renderPaper(p, q, c){
+  const st = settings;
+  let rows = "";
+  if (p) {
+    const items = [{t: "product"}];
+    (p.sections||[]).forEach(s => { if (s.title) items.push({t: "head", x: heading(s.title)}); (s.lines||[]).forEach(l => items.push({t: "line", x: bullet(l)})); });
+    const sc = selectedScope(p);
+    if (sc.length) { items.push({t: "head", x: "CẤU HÌNH TIÊU CHUẨN"}); sc.forEach(it => items.push(isLabel(it) ? {t: "head", x: it.text} : {t: "scope", x: bullet(it.text), code: it.code, qty: it.qty})); }
+    items.forEach((it, i) => {
+      const cls = [i === 0 ? "first" : "", i === items.length - 1 ? "last" : ""].join(" ");
+      if (it.t === "product") rows += `<tr class="${cls}"><td class="c">1</td><td class="c">${esc(p.code||"")}</td><td class="pre"><b>${esc(productHeader(p))}</b></td><td class="c">${c.qty||""}</td><td class="r">${c.price ? vnd(c.price) : ""}</td><td class="r">${c.sub ? vnd(c.sub) : ""}</td></tr>`;
+      else if (it.t === "scope") rows += `<tr class="${cls}"><td></td><td class="c">${esc(it.code)}</td><td class="pre">${esc(it.x)}</td><td class="c">${esc(it.qty)}</td><td></td><td></td></tr>`;
+      else rows += `<tr class="${cls}"><td></td><td></td><td class="pre ${it.t === "head" ? "hd" : ""}">${esc(it.x)}</td><td></td><td></td><td></td></tr>`;
+    });
+  } else rows = `<tr class="first last"><td class="c">1</td><td></td><td><span class="ph">[Chọn một máy trong thư viện để hiện mô tả kỹ thuật]</span></td><td></td><td></td><td></td></tr>`;
+  const mw = moneyWords(c.total);
+  $("paper").innerHTML = `
+    <div class="co">${esc(st.companyName)}</div>
+    ${st.header ? `<div class="co-sub">${esc(st.header)}</div>` : `<div class="co-sub ph">[Thông tin văn phòng: điền ở tab Cài đặt]</div>`}
+    <div class="rule"></div>
+    <h1>BẢNG BÁO GIÁ</h1>
+    <dl class="info">
+      <dt>Kính gửi:</dt><dd><b>${ph(q.customer, "Tên khách hàng")}</b></dd>
+      <dt>Địa chỉ:</dt><dd>${esc(q.address)}</dd>
+      <dt>Người nhận:</dt><dd>${esc(q.attn)}</dd>
+      <dt>Điện thoại:</dt><dd>${esc(q.tel)}</dd>
+      <dt>Email:</dt><dd>${esc(q.email)}</dd>
+      <dt>Ngày:</dt><dd>${esc(fmtDate(q.date))}</dd>
+    </dl>
+    <p style="font-style:italic;margin:0 0 8px">${esc(introText(st))}</p>
+    <table>
+      <colgroup><col style="width:5%"><col style="width:11%"><col><col style="width:6%"><col style="width:13%"><col style="width:15%"></colgroup>
+      <thead><tr><th>STT</th><th>Mã đặt hàng</th><th>Mô tả hàng hóa</th><th>SL</th><th>Đơn giá<br>(VNĐ)</th><th>Thành tiền<br>(VNĐ)</th></tr></thead>
+      <tbody>${rows}
+        <tr class="tot"><td colspan="5" class="r">Tổng giá trị trước thuế GTGT</td><td class="r">${c.sub ? vnd(c.sub) : ""}</td></tr>
+        <tr class="tot"><td colspan="5" class="r">Thuế GTGT (${c.vat}%)</td><td class="r">${c.tax ? vnd(c.tax) : ""}</td></tr>
+        <tr class="tot"><td colspan="5" class="r">Tổng giá trị sau thuế GTGT</td><td class="r">${c.total ? vnd(c.total) : ""}</td></tr>
+      </tbody>
+    </table>
+    ${mw ? `<p class="words">Bằng chữ: ${esc(mw)}</p>` : `<p class="words ph">[Bằng chữ: tự hiện khi có đơn giá]</p>`}
+    <p style="font-weight:700;margin:10px 0 4px">CÁC ĐIỀU KHOẢN THƯƠNG MẠI:</p>
+    <ol class="terms">${termsList(q.terms, c.vat).map(t => `<li>${esc(t)}</li>`).join("")}</ol>
+    <div class="sign"><div>${esc(st.companyName)}${st.signTitle ? "<br>" + esc(st.signTitle) : ""}<div class="space"></div>${esc(st.signName)}</div></div>`;
+}
+
+$("quoteForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const p = currentProduct(), q = readQuote(), s = $("q-status");
+  if (!p) return;
+  s.className = "status"; s.textContent = "Đang tạo file…";
+  try {
+    if (!window.ExcelJS) throw new Error("Thư viện tạo Excel chưa tải xong. Tải lại trang rồi thử lại.");
+    const wb = buildWorkbook(window.ExcelJS, p, q, settings, selectedScope(p));
+    const buf = await wb.xlsx.writeBuffer();
+    const url = URL.createObjectURL(new Blob([buf], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+    const a = document.createElement("a"); a.href = url; a.download = fileName(p, q); document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    s.textContent = "Đã lưu " + fileName(p, q);
+  } catch (err) {
+    s.className = "status err";
+    s.textContent = (err && err.message) || "Không tạo được file.";
+  }
+});
+
+/* ---------- Thư viện ---------- */
+function renderLib(){
+  const list = sortedProducts().filter(p => matches(p, $("l-search").value)), ul = $("l-list");
+  ul.innerHTML = "";
+  if (!products.size) { ul.innerHTML = `<li class="empty">Chưa có máy nào. Bấm "Thêm máy mới" hoặc gửi tài liệu cho Claude.</li>`; return; }
+  if (!list.length) { ul.innerHTML = `<li class="empty">Không có máy khớp từ khóa.</li>`; return; }
+  list.forEach(p => {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.type = "button"; if (p.id === editingId) b.setAttribute("aria-current", "true");
+    b.innerHTML = `<span>${esc(p.name || "(chưa đặt tên)")}</span><span class="pm">${esc([p.model, p.maker].filter(Boolean).join(" · "))}</span>`;
+    b.addEventListener("click", () => openProduct(p.id));
+    li.appendChild(b); ul.appendChild(li);
+  });
+}
+$("l-search").addEventListener("input", renderLib);
+$("l-new").addEventListener("click", () => openProduct(null));
+
+function openProduct(id){
+  editingId = id; const p = id ? products.get(id) : null;
+  $("p-title").textContent = p ? "Sửa thông tin máy" : "Thêm máy mới";
+  $("p-name").value = p?.name || ""; $("p-model").value = p?.model || ""; $("p-code").value = p?.code || "";
+  $("p-maker").value = p?.maker || ""; $("p-origin").value = p?.origin || "";
+  $("p-body").value = bodyToText(p?.sections);
+  edScope = (p?.scope || []).map(it => ({code: it.code || "", text: it.text || "", qty: it.qty ?? ""}));
+  $("p-del").hidden = !p; $("p-use").hidden = !p; $("p-confirm").hidden = true; $("p-status").textContent = "";
+  renderEdScope(); renderLib();
+}
+function renderEdScope(){
+  const box = $("p-scope"); box.innerHTML = "";
+  if (!edScope.length) box.innerHTML = `<p class="hint">Chưa có mục nào.</p>`;
+  edScope.forEach((it, i) => {
+    const d = document.createElement("div"); d.className = "sitem";
+    d.innerHTML = `<div class="top"><label for="ps-c${i}">Mã số<input id="ps-c${i}" value="${esc(it.code)}"></label>
+        <label for="ps-q${i}">SL<input id="ps-q${i}" class="num" value="${esc(it.qty)}"></label>
+        <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm danger" data-a="del">Xóa mục</button></div></div>
+      <label for="ps-t${i}">Mô tả<textarea id="ps-t${i}" rows="3">${esc(it.text)}</textarea></label>`;
+    d.querySelector(`#ps-c${i}`).addEventListener("input", e => it.code = e.target.value);
+    d.querySelector(`#ps-q${i}`).addEventListener("input", e => it.qty = e.target.value.trim());
+    d.querySelector(`#ps-t${i}`).addEventListener("input", e => it.text = e.target.value);
+    d.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", () => {
+      const a = b.dataset.a;
+      if (a === "del") edScope.splice(i, 1);
+      if (a === "up" && i > 0) [edScope[i-1], edScope[i]] = [edScope[i], edScope[i-1]];
+      if (a === "down" && i < edScope.length - 1) [edScope[i+1], edScope[i]] = [edScope[i], edScope[i+1]];
+      renderEdScope();
+    }));
+    box.appendChild(d);
+  });
+}
+$("p-addScope").addEventListener("click", () => { edScope.push({code: "", text: "", qty: "1"}); renderEdScope(); });
+
+$("prodForm").addEventListener("submit", async e => {
+  e.preventDefault(); const s = $("p-status"); s.className = "status";
+  const name = $("p-name").value.trim();
+  if (!name) { s.className = "status err"; s.textContent = "Cần nhập tên máy."; return; }
+  s.textContent = "Đang lưu…";
+  try {
+    const scope = edScope.filter(it => String(it.text).trim() || String(it.code).trim())
+      .map(it => ({code: String(it.code).trim(), text: String(it.text).replace(/\s+$/, ""), qty: String(it.qty ?? "").trim()}));
+    const data = {name, model: $("p-model").value.trim(), code: $("p-code").value.trim(), maker: $("p-maker").value.trim(),
+      origin: $("p-origin").value.trim(), sections: parseBody($("p-body").value), scope};
+    if (editingId) data.id = editingId;
+    const {data: saved, error} = await sb.from("quote_products").upsert(data).select().single();
+    if (error) throw error;
+    editingId = saved.id; await loadProducts(); s.textContent = "Đã lưu.";
+    $("p-del").hidden = false; $("p-use").hidden = false; $("p-title").textContent = "Sửa thông tin máy";
+  } catch (err) { s.className = "status err"; s.textContent = "Lưu không thành công: " + (err.message || "thử lại sau ít phút."); }
+});
+$("p-use").addEventListener("click", () => { if (!editingId) return; $("q-search").value = ""; fillSelect(editingId); syncScope(true); refresh(); showTab("quote"); });
+$("p-del").addEventListener("click", () => $("p-confirm").hidden = false);
+$("p-confirmNo").addEventListener("click", () => $("p-confirm").hidden = true);
+$("p-confirmYes").addEventListener("click", async () => {
+  if (!editingId) return;
+  try { const {error} = await sb.from("quote_products").delete().eq("id", editingId); if (error) throw error;
+    await loadProducts(); openProduct(null); $("p-status").textContent = "Đã xóa."; }
+  catch (err) { $("p-status").className = "status err"; $("p-status").textContent = "Không xóa được."; }
+});
+
+/* ---------- Cài đặt ---------- */
+const SF = {co: "companyName", hdr: "header", intro: "intro", signTitle: "signTitle", signName: "signName"};
+function fillSettings(){
+  Object.entries(SF).forEach(([k, f]) => $("s-" + k).value = settings[f] || "");
+  $("s-vat").value = settings.vat; $("s-terms").value = settings.terms;
+  const ro = !canAdmin; document.querySelectorAll("#setForm input,#setForm textarea").forEach(el => el.readOnly = ro);
+  $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ người quản lý trang mới sửa được cài đặt." : "";
+}
+$("setForm").addEventListener("submit", async e => {
+  e.preventDefault(); const s = $("s-status");
+  const data = {}; Object.entries(SF).forEach(([k, f]) => data[f] = $("s-" + k).value.trim());
+  data.vat = dec($("s-vat").value) || 0; data.terms = $("s-terms").value.trim();
+  s.className = "status"; s.textContent = "Đang lưu…";
+  try { const {data: rows, error} = await sb.from("quote_settings").upsert({id: "company", data}).select();
+    if (error || !rows || !rows.length) throw error || new Error("Bạn không có quyền sửa cài đặt.");
+    applySettings(data); s.textContent = "Đã lưu. Báo giá mới sẽ dùng thông tin này."; }
+  catch (err) { s.className = "status err"; s.textContent = /row-level|permission|quyền/i.test(err.message||"") ? "Bạn không có quyền sửa cài đặt." : "Lưu không thành công: " + (err.message || ""); }
+});
+
+/* ---------- Khởi động ---------- */
+fillSelect(draft.productId); renderLib(); fillSettings(); openProduct(null);
+showTab(LS.get("bg_tab") || "quote");
+
+const ROW = r => ({id: r.id, name: r.name, model: r.model, code: r.code, maker: r.maker, origin: r.origin, sections: r.sections || [], scope: r.scope || []});
+async function loadProducts(){
+  const {data, error} = await sb.from("quote_products").select("*");
+  if (error) { $("dbBanner").hidden = false; $("dbBanner").textContent = "Không tải được thư viện máy: " + error.message; return; }
+  $("dbBanner").hidden = true;
+  products = new Map(data.map(r => [r.id, ROW(r)]));
+  fillSelect($("q-product").value || draft.productId); renderLib();
+}
+let settingsFirst = true;
+function applySettings(d){
+  settings = {...DEFAULT_SETTINGS, ...(d || {})};
+  if (Array.isArray(settings.terms)) settings.terms = settings.terms.join("\n");
+  fillSettings();
+  if (settingsFirst) { settingsFirst = false; if (!draft.terms) $("q-terms").value = settings.terms; if (!draft.vat) $("q-vat").value = String(settings.vat); }
+  refresh();
+}
+async function loadSettings(){
+  const {data} = await sb.from("quote_settings").select("data").eq("id", "company").maybeSingle();
+  applySettings(data && data.data);
+}
+let channel = null, entered = false;
+async function enterApp(){
+  $("loginView").hidden = true; $("appView").hidden = false;
+  $("whoEmail").textContent = session.user.email || "";
+  if (entered) return; entered = true;
+  const {data: role} = await sb.rpc("get_my_role");
+  canAdmin = role === "admin" || role === "super_admin"; fillSettings();
+  await Promise.all([loadSettings(), loadProducts()]);
+  channel = sb.channel("bao-gia")
+    .on("postgres_changes", {event: "*", schema: "public", table: "quote_products"}, () => loadProducts())
+    .on("postgres_changes", {event: "*", schema: "public", table: "quote_settings"}, () => loadSettings())
+    .subscribe();
+}
+function showLogin(msg){
+  $("appView").hidden = true; $("loginView").hidden = false;
+  if (msg != null) $("lg-status").textContent = msg;
+}
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); const st = $("lg-status"); st.className = "status"; st.textContent = "Đang đăng nhập…"; $("lg-btn").disabled = true;
+  try {
+    const id = $("lg-user").value.trim(); let email = id;
+    if (!id.includes("@")) {
+      const {data, error} = await sb.rpc("get_auth_email_for_username", {p_username: id});
+      if (error || !data) throw new Error("Sai tên đăng nhập hoặc mật khẩu.");
+      email = data;
+    }
+    const {error} = await sb.auth.signInWithPassword({email, password: $("lg-pass").value});
+    if (error) throw new Error(/invalid/i.test(error.message) ? "Sai tên đăng nhập hoặc mật khẩu." : error.message);
+    st.textContent = ""; $("lg-pass").value = "";
+  } catch (err) { st.className = "status err"; st.textContent = err.message; }
+  finally { $("lg-btn").disabled = false; }
+});
+$("logout").addEventListener("click", async () => { await sb.auth.signOut(); });
+
+(function boot(){
+  const cfg = window.APP_CONFIG || {};
+  if (!window.supabase || !cfg.SUPABASE_URL || /YOUR_/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY)) {
+    showLogin(); $("lg-status").className = "status err"; $("lg-status").textContent = "Chưa cấu hình Supabase trong config.js."; return;
+  }
+  sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  sb.auth.onAuthStateChange((event, sess) => {
+    session = sess;
+    if (sess) setTimeout(enterApp, 0);
+    else { entered = false; if (channel) { sb.removeChannel(channel); channel = null; } products = new Map(); showLogin(""); }
+  });
+})();
+</script>
+</body>
+</html>
