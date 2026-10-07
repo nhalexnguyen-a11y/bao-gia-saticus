@@ -237,7 +237,6 @@ details.box[open] summary{margin-bottom:10px}
   <div class="me"><b id="meName">…</b><span class="badge" id="meRole" hidden></span></div>
   <nav class="nav">
     <button type="button" id="nav-lib" aria-current="page">Thư viện báo giá</button>
-    <button type="button" id="nav-quote">Xuất báo giá <span id="nav-n"></span></button>
     <button type="button" id="nav-new">Thêm model</button>
     <button type="button" id="nav-set">Cài đặt</button>
     <a id="nav-gor" href="https://alex-workspace.pages.dev/app">← Về GOR</a>
@@ -714,14 +713,13 @@ let editingId = null, edScope = [], view = "lib";
 function show(v){
   view = v;
   ["lib","quote","edit","set"].forEach(x => $("view-" + x).hidden = x !== v);
-  const cur = {lib: "nav-lib", quote: "nav-quote", edit: editingId ? "" : "nav-new", set: "nav-set"}[v];
-  ["nav-lib","nav-quote","nav-new","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
+  const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", set: "nav-set"}[v];
+  ["nav-lib","nav-new","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
 }
 $("nav-lib").addEventListener("click", () => guard(() => show("lib")));
 $("nav-set").addEventListener("click", () => guard(() => show("set")));
 $("nav-new").addEventListener("click", () => guard(() => openEditor(null)));
-$("nav-quote").addEventListener("click", () => guard(() => openQuote()));
 $("q-back").addEventListener("click", () => show("lib"));
 $("p-back").addEventListener("click", () => guard(() => show("lib")));
 
@@ -797,7 +795,6 @@ function toggleSel(id){
 }
 function renderSelbar(){
   selected = selected.filter(id => products.has(id) || !products.size);
-  $("nav-n").textContent = selected.length ? "(" + selected.length + ")" : "";
   const show = view === "lib" && selected.length > 0 && products.size > 0;
   $("selbar").hidden = !show; if (!show) return;
   $("sel-n").textContent = "Đã chọn " + selected.length + " model";
