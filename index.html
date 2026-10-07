@@ -65,7 +65,7 @@ input,select,textarea{font:inherit;font-size:13.5px;color:var(--fg);background:v
 input::placeholder,textarea::placeholder{color:var(--muted)}
 input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:var(--ink);margin:0}
 textarea{resize:vertical;line-height:1.45}
-textarea.code{font-family:var(--f-mono);font-size:12.5px}
+textarea.code{font-family:var(--f-ui);font-size:13.5px;line-height:1.55}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
 .num{font-variant-numeric:tabular-nums;text-align:right}
 .hint{font-size:12px;color:var(--muted);margin:0}
@@ -179,6 +179,26 @@ details.box[open] summary{margin-bottom:10px}
 @media (max-width:560px){.sitem .top{grid-template-columns:minmax(0,1fr) 80px}}
 .confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;border:1px solid var(--red);border-radius:14px;font-size:13px;color:var(--red)}
 .foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);text-align:center;font-size:11.5px;color:var(--muted)}
+
+/* Trang nhập model */
+.egrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:18px;align-items:start}
+@media (max-width:1250px){.egrid{grid-template-columns:minmax(0,1fr)}}
+.editor-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.epreview{position:sticky;top:18px;display:flex;flex-direction:column;gap:10px;min-width:0;max-height:calc(100vh - 36px)}
+.epreview .preview-shell{overflow:auto;padding:12px}
+@media (max-width:1250px){.epreview{position:static;max-height:none}}
+.paper.mini{width:auto;min-width:420px;padding:16px;font-size:12px}
+.paper.mini table{font-size:11.5px}
+.epreview h2,.h2row h2{margin:0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--title)}
+.h2row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tools{gap:6px}
+.pastebox{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line2);border-radius:14px;padding:12px}
+.sitem.lbl{background:var(--soft)}
+.sitem.lbl textarea{font-weight:700}
+.note{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;margin-bottom:14px;border:1px solid var(--line2);border-radius:14px;background:var(--surface);font-size:13px}
+#p-leave{margin-bottom:14px;background:var(--surface)}
+.savebar{position:sticky;bottom:12px;z-index:3;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -284,39 +304,100 @@ details.box[open] summary{margin-bottom:10px}
 
   <!-- THÊM / SỬA MODEL -->
   <section id="view-edit" hidden>
-    <div class="pagehead"><div><h1 id="p-title">Thêm model</h1><p>Dòng máy và hãng dùng để nhóm, lọc trong thư viện.</p></div>
-      <button class="btn" type="button" id="p-back">← Thư viện</button></div>
-    <form class="panel editor" id="prodForm" autocomplete="off">
-      <div class="row">
-        <label for="p-name">Dòng máy<input id="p-name" list="dl-cat" placeholder="VD: Máy Rửa Dụng Cụ" required></label>
-        <label for="p-maker">Hãng (NSX)<input id="p-maker" list="dl-brand" placeholder="VD: Eurping"></label>
-      </div>
-      <div class="row">
-        <label for="p-model">Model<input id="p-model"></label>
-        <label for="p-code">Mã đặt hàng<input id="p-code"></label>
-        <label for="p-origin">Xuất xứ<input id="p-origin"></label>
-      </div>
-      <datalist id="dl-cat"></datalist><datalist id="dl-brand"></datalist>
-      <label for="p-body">Mô tả kỹ thuật. Dòng bắt đầu bằng <code>#</code> là tiêu đề mục (tự in hoa), mỗi dòng còn lại là một gạch đầu dòng.
-        <textarea id="p-body" class="code" rows="18" placeholder="# Cấu trúc thiết bị&#10;Vỏ máy làm bằng thép không gỉ 304...&#10;# Thông số kỹ thuật&#10;Điện áp & công suất: 220V, 5 kW"></textarea>
-      </label>
-      <div class="sep"></div>
-      <h2>Cấu hình tiêu chuẩn</h2>
-      <p class="hint">Mỗi mục một khung. Mục để trống SL sẽ hiện như dòng nhãn in đậm (VD: "Phụ Kiện Rửa:").</p>
-      <div class="scope-ed" id="p-scope"></div>
-      <div class="btns"><button class="btn sm" type="button" id="p-addScope">Thêm mục</button></div>
-      <div class="sep"></div>
-      <div class="btns">
-        <button class="btn primary" type="submit" id="p-save">Lưu model</button>
-        <button class="btn danger" type="button" id="p-del">Xóa model</button>
-      </div>
-      <div class="confirm" id="p-confirm" hidden>
-        <span>Xóa model này khỏi thư viện? Không hoàn tác được.</span>
-        <button class="btn danger sm" type="button" id="p-confirmYes">Xóa</button>
-        <button class="btn sm" type="button" id="p-confirmNo">Hủy</button>
-      </div>
-      <p class="status" id="p-status" role="status"></p>
-    </form>
+    <div class="pagehead"><div><h1 id="p-title">Thêm model</h1><p id="p-sub">Dòng máy và hãng dùng để nhóm, lọc trong thư viện.</p></div>
+      <div class="btns"><button class="btn" type="button" id="p-dup" hidden>Nhân bản model này</button><button class="btn" type="button" id="p-back">← Thư viện</button></div></div>
+
+    <div class="confirm" id="p-leave" hidden>
+      <span>Bạn có thay đổi chưa lưu. Rời trang thì thay đổi vẫn được giữ trong bản nháp trên máy này.</span>
+      <button class="btn sm danger" type="button" id="p-leaveYes">Rời trang</button>
+      <button class="btn sm" type="button" id="p-leaveNo">Ở lại</button>
+    </div>
+    <div class="note" id="p-draft" hidden>
+      <span id="p-draftTxt">Có bản nháp chưa lưu từ lần trước.</span>
+      <button class="btn sm" type="button" id="p-draftUse">Khôi phục bản nháp</button>
+      <button class="btn sm ghost" type="button" id="p-draftDrop">Bỏ bản nháp</button>
+    </div>
+
+    <div class="egrid">
+      <form class="editor-col" id="prodForm" autocomplete="off" novalidate>
+        <div class="panel">
+          <h2>Nhập nhanh từ file báo giá cũ</h2>
+          <p class="hint">Chọn file Excel báo giá theo form SatiCus (.xlsx). Ứng dụng đọc tên máy, model, NSX, xuất xứ, các mục mô tả và cấu hình tiêu chuẩn rồi điền sẵn bên dưới để bạn kiểm tra. File được đọc ngay trên máy bạn, không gửi đi đâu.</p>
+          <div class="btns">
+            <label class="btn" for="p-xlsx" style="flex-direction:row">Chọn file Excel…</label>
+            <input id="p-xlsx" type="file" accept=".xlsx" class="sr">
+            <select id="p-xlsxPick" hidden aria-label="Chọn model trong file"></select>
+            <button class="btn sm" type="button" id="p-xlsxUse" hidden>Dùng model này</button>
+          </div>
+          <p class="status" id="p-xlsxStatus" role="status"></p>
+        </div>
+
+        <div class="panel">
+          <h2>Thông tin chung</h2>
+          <div class="row">
+            <label for="p-name">Dòng máy *<input id="p-name" list="dl-cat" placeholder="VD: Máy Rửa Dụng Cụ"></label>
+            <label for="p-maker">Hãng (NSX) *<input id="p-maker" list="dl-brand" placeholder="VD: Eurping"></label>
+          </div>
+          <div class="row">
+            <label for="p-model">Model *<input id="p-model" placeholder="VD: LW230H"></label>
+            <label for="p-code">Mã đặt hàng<input id="p-code"></label>
+            <label for="p-origin">Xuất xứ<input id="p-origin" list="dl-origin" placeholder="VD: Đức"></label>
+          </div>
+          <datalist id="dl-cat"></datalist><datalist id="dl-brand"></datalist><datalist id="dl-origin"></datalist>
+          <p class="status err" id="p-dupWarn" hidden></p>
+        </div>
+
+        <div class="panel">
+          <div class="h2row"><h2>Mô tả kỹ thuật</h2><span class="count" id="p-bodyStat"></span></div>
+          <p class="hint">Dòng bắt đầu bằng <code>#</code> là tiêu đề mục (tự in hoa khi xuất). Mỗi dòng còn lại là một gạch đầu dòng. Dán văn bản từ PDF/Word rồi dùng các nút bên dưới để chỉnh nhanh.</p>
+          <div class="btns tools">
+            <button class="btn sm" type="button" id="t-head" title="Biến dòng đang đặt con trỏ thành tiêu đề mục">+ Tiêu đề mục</button>
+            <button class="btn sm" type="button" id="t-merge" title="Nối các dòng bị ngắt giữa câu khi dán từ PDF">Gộp dòng bị ngắt</button>
+            <button class="btn sm" type="button" id="t-auto" title="Dòng ngắn kết thúc bằng dấu hai chấm hoặc viết hoa toàn bộ sẽ thành tiêu đề mục">Tự nhận tiêu đề</button>
+            <button class="btn sm" type="button" id="t-clean" title="Bỏ dòng trống, dòng trùng liền nhau, khoảng trắng thừa">Dọn dòng trống</button>
+            <button class="btn sm ghost" type="button" id="t-undo" hidden>Hoàn tác</button>
+          </div>
+          <textarea id="p-body" class="code" rows="20" placeholder="# Cấu trúc thiết bị:&#10;Vỏ máy làm bằng thép không gỉ 304...&#10;# Thông số kỹ thuật:&#10;Điện áp &amp; công suất: 220V, 5 kW"></textarea>
+          <p class="status" id="t-status" role="status"></p>
+        </div>
+
+        <div class="panel">
+          <div class="h2row"><h2>Cấu hình tiêu chuẩn</h2><span class="count" id="p-scopeStat"></span></div>
+          <p class="hint">Mỗi mục một khung. Mục để trống SL là dòng nhãn nhóm in đậm (VD: "Phụ Kiện Rửa:").</p>
+          <div class="scope-ed" id="p-scope"></div>
+          <div class="btns">
+            <button class="btn sm" type="button" id="p-addScope">+ Thêm mục</button>
+            <button class="btn sm" type="button" id="p-addLabel">+ Thêm nhãn nhóm</button>
+            <button class="btn sm" type="button" id="p-pasteOpen">Dán từ Excel</button>
+          </div>
+          <div class="pastebox" id="p-pasteBox" hidden>
+            <label for="p-paste">Copy các ô trong Excel (cột Mã số, Mô tả, SL) rồi dán vào đây. Mỗi dòng một mục; có thể chỉ có cột Mô tả, hoặc Mô tả và SL.
+              <textarea id="p-paste" class="code" rows="6" placeholder="PLYT-66&#9;Giỏ module phun rửa chai&#9;1&#10;Thực hiện lắp đặt&#9;1&#10;Phụ Kiện Rửa:"></textarea>
+            </label>
+            <div class="btns"><button class="btn sm primary" type="button" id="p-pasteAdd">Thêm vào danh sách</button><button class="btn sm ghost" type="button" id="p-pasteClose">Đóng</button></div>
+          </div>
+        </div>
+
+        <div class="panel savebar">
+          <div class="btns">
+            <button class="btn primary" type="submit" id="p-save">Lưu model</button>
+            <button class="btn" type="button" id="p-saveNext">Lưu và thêm model cùng hãng</button>
+            <button class="btn danger" type="button" id="p-del">Xóa model</button>
+          </div>
+          <div class="confirm" id="p-confirm" hidden>
+            <span>Xóa model này khỏi thư viện? Không hoàn tác được.</span>
+            <button class="btn danger sm" type="button" id="p-confirmYes">Xóa</button>
+            <button class="btn sm" type="button" id="p-confirmNo">Hủy</button>
+          </div>
+          <p class="status" id="p-status" role="status"></p>
+        </div>
+      </form>
+
+      <aside class="epreview" aria-label="Xem trước trong báo giá">
+        <div class="h2row"><h2 class="ttl">Xem trước trong báo giá</h2></div>
+        <div class="preview-shell"><div class="paper mini" id="p-preview"></div></div>
+      </aside>
+    </div>
   </section>
 
   <!-- CÀI ĐẶT -->
@@ -566,12 +647,12 @@ function show(v){
   ["nav-lib","nav-quote","nav-new","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
 }
-$("nav-lib").addEventListener("click", () => show("lib"));
-$("nav-set").addEventListener("click", () => show("set"));
-$("nav-new").addEventListener("click", () => openEditor(null));
-$("nav-quote").addEventListener("click", () => openQuote());
+$("nav-lib").addEventListener("click", () => guard(() => show("lib")));
+$("nav-set").addEventListener("click", () => guard(() => show("set")));
+$("nav-new").addEventListener("click", () => guard(() => openEditor(null)));
+$("nav-quote").addEventListener("click", () => guard(() => openQuote()));
 $("q-back").addEventListener("click", () => show("lib"));
-$("p-back").addEventListener("click", () => show("lib"));
+$("p-back").addEventListener("click", () => guard(() => show("lib")));
 
 /* ---------- Thư viện ---------- */
 function matchSearch(p, q){ q = q.trim().toLowerCase(); return !q || [p.name, p.maker, p.model, p.code, p.origin].join(" ").toLowerCase().includes(q); }
@@ -594,6 +675,7 @@ function renderFilters(){
   brands.forEach(bn => fb.appendChild(fbtn(bn, inCat.filter(p => brandOf(p) === bn).length, fBrand === bn, () => { fBrand = bn; saveFilters(); renderLib(); })));
   // gợi ý khi nhập model mới
   $("dl-cat").innerHTML = cats.map(x => `<option value="${esc(x)}">`).join("");
+  $("dl-origin").innerHTML = [...new Set(all.map(p => (p.origin||"").trim()).filter(Boolean))].sort(vsort).map(x => `<option value="${esc(x)}">`).join("");
   $("dl-brand").innerHTML = [...new Set(all.map(p => (p.maker||"").trim()).filter(Boolean))].sort(vsort).map(x => `<option value="${esc(x)}">`).join("");
 }
 function saveFilters(){ LS.set("bg_fcat", fCat); LS.set("bg_fbrand", fBrand); }
@@ -783,66 +865,341 @@ $("quoteForm").addEventListener("submit", async e => {
 });
 
 /* ---------- Thêm / sửa model ---------- */
-function openEditor(id){
-  editingId = id; const p = id ? products.get(id) : null;
-  $("p-title").textContent = p ? "Sửa model" : "Thêm model";
-  $("p-name").value = p?.name || (fCat || ""); $("p-maker").value = p?.maker || (fBrand && fBrand !== NO ? fBrand : "");
-  $("p-model").value = p?.model || ""; $("p-code").value = p?.code || ""; $("p-origin").value = p?.origin || "";
-  $("p-body").value = bodyToText(p?.sections);
-  edScope = (p?.scope || []).map(it => ({code: it.code || "", text: it.text || "", qty: it.qty ?? ""}));
-  $("p-del").hidden = !p; $("p-confirm").hidden = true; $("p-status").textContent = ""; $("p-status").className = "status";
-  renderEdScope(); show("edit");
+let edDirty = false, pendingNav = null, dupAck = false, bodyUndo = null, xlsxFound = [];
+const norm = s => String(s || "").normalize("NFC").replace(/\s+/g, " ").trim();
+const key = s => norm(s).toLocaleLowerCase("vi");
+
+/* Dùng đúng cách viết đã có trong thư viện nếu chỉ khác hoa/thường hoặc khoảng trắng */
+function canonical(value, field){
+  const v = norm(value); if (!v) return v;
+  const hit = [...products.values()].map(p => norm(p[field])).find(x => x && key(x) === key(v));
+  return hit || v;
 }
+function readEditor(){
+  const scope = edScope.filter(it => String(it.text).trim() || String(it.code).trim())
+    .map(it => ({code: norm(it.code), text: String(it.text).replace(/\s+$/, "").replace(/^\s+/, ""), qty: String(it.qty ?? "").trim()}));
+  return {name: canonical($("p-name").value, "name"), maker: canonical($("p-maker").value, "maker"), model: norm($("p-model").value),
+    code: norm($("p-code").value), origin: canonical($("p-origin").value, "origin"), sections: parseBody($("p-body").value), scope};
+}
+function editorSnapshot(){
+  return {name: $("p-name").value, maker: $("p-maker").value, model: $("p-model").value, code: $("p-code").value,
+    origin: $("p-origin").value, body: $("p-body").value, scope: edScope.map(x => ({...x}))};
+}
+function fillEditor(d){
+  $("p-name").value = d.name || ""; $("p-maker").value = d.maker || ""; $("p-model").value = d.model || "";
+  $("p-code").value = d.code || ""; $("p-origin").value = d.origin || "";
+  $("p-body").value = d.body != null ? d.body : bodyToText(d.sections);
+  edScope = (d.scope || []).map(it => ({code: it.code || "", text: it.text || "", qty: it.qty ?? ""}));
+  renderEdScope(); afterEdit(false);
+}
+const DRAFT = "bg_edraft";
+function saveDraft(){ LS.set(DRAFT, {id: editingId, at: Date.now(), data: editorSnapshot()}); }
+function clearDraft(){ try { localStorage.removeItem(DRAFT); } catch(e){} }
+
+function openEditor(id, opts = {}){
+  editingId = id; dupAck = false; bodyUndo = null; $("t-undo").hidden = true; $("t-status").textContent = "";
+  const p = id ? products.get(id) : null;
+  $("p-title").textContent = p ? "Sửa model" : "Thêm model";
+  $("p-sub").textContent = p ? [p.name, p.maker].filter(Boolean).join(" · ") : "Dòng máy và hãng dùng để nhóm, lọc trong thư viện.";
+  if (p) fillEditor(p);
+  else fillEditor({name: opts.name ?? (fCat || ""), maker: opts.maker ?? (fBrand && fBrand !== NO ? fBrand : ""), origin: opts.origin || ""});
+  $("p-del").hidden = !p; $("p-dup").hidden = !p; $("p-confirm").hidden = true; $("p-leave").hidden = true;
+  $("p-status").textContent = ""; $("p-status").className = "status"; $("p-xlsxStatus").textContent = "";
+  $("p-xlsxPick").hidden = true; $("p-xlsxUse").hidden = true; $("p-pasteBox").hidden = true;
+  edDirty = false;
+  const dr = LS.get(DRAFT);
+  $("p-draft").hidden = !(dr && (dr.id || null) === (id || null) && dr.data && JSON.stringify(dr.data) !== JSON.stringify(editorSnapshot()));
+  if (!$("p-draft").hidden) $("p-draftTxt").textContent = "Có bản nháp chưa lưu lúc " + new Date(dr.at).toLocaleString("vi-VN") + ".";
+  show("edit");
+}
+$("p-draftUse").addEventListener("click", () => { const dr = LS.get(DRAFT); if (dr) { fillEditor(dr.data); edDirty = true; } $("p-draft").hidden = true; });
+$("p-draftDrop").addEventListener("click", () => { clearDraft(); $("p-draft").hidden = true; });
+
+function afterEdit(dirty = true){
+  if (dirty) { edDirty = true; dupAck = false; saveDraft(); }
+  const secs = parseBody($("p-body").value);
+  $("p-bodyStat").textContent = secs.filter(s => s.title).length + " mục · " + secs.reduce((a, s) => a + s.lines.length, 0) + " dòng";
+  const n = edScope.filter(x => !isLabel(x) && String(x.text).trim()).length, nl = edScope.filter(x => isLabel(x) && String(x.text).trim()).length;
+  $("p-scopeStat").textContent = n + " mục" + (nl ? " · " + nl + " nhãn" : "");
+  checkDup(); renderEdPreview();
+}
+["p-name","p-maker","p-model","p-code","p-origin","p-body"].forEach(id => $(id).addEventListener("input", () => afterEdit()));
+
+function checkDup(){
+  const d = {name: $("p-name").value, maker: $("p-maker").value, model: $("p-model").value};
+  const hit = d.model.trim() && [...products.values()].find(p => p.id !== editingId && key(p.name) === key(d.name) && key(p.maker) === key(d.maker) && key(p.model) === key(d.model));
+  $("p-dupWarn").hidden = !hit;
+  if (hit) $("p-dupWarn").textContent = "Thư viện đã có " + [hit.name, hit.maker, hit.model].join(" · ") + ". Kiểm tra lại để tránh trùng.";
+  return hit;
+}
+function renderEdPreview(){
+  const p = readEditor();
+  const body = [{type: "product"}, ...itemBody(p, p.scope)];
+  let rows = "";
+  body.forEach((b, i) => {
+    const cls = [i === 0 ? "first" : "", i === body.length - 1 ? "last" : ""].join(" ");
+    if (b.type === "product") rows += `<tr class="${cls}"><td class="c">1</td><td class="c">${esc(p.code)}</td><td class="pre"><b>${esc(productHeader(p))}</b></td><td class="c">1</td></tr>`;
+    else if (b.type === "scope") rows += `<tr class="${cls}"><td></td><td class="c">${esc(b.code)}</td><td class="pre">${esc(b.text)}</td><td class="c">${esc(b.qty)}</td></tr>`;
+    else rows += `<tr class="${cls}"><td></td><td></td><td class="pre ${b.type === "head" ? "hd" : ""}">${esc(b.text)}</td><td></td></tr>`;
+  });
+  $("p-preview").innerHTML = `<table><colgroup><col style="width:7%"><col style="width:15%"><col><col style="width:8%"></colgroup>
+    <thead><tr><th>STT</th><th>Mã đặt hàng</th><th>Mô tả hàng hóa</th><th>SL</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* Cấu hình tiêu chuẩn */
 function renderEdScope(){
   const box = $("p-scope"); box.innerHTML = "";
   if (!edScope.length) box.innerHTML = `<p class="hint">Chưa có mục nào.</p>`;
   edScope.forEach((it, i) => {
-    const d = document.createElement("div"); d.className = "sitem";
+    const d = document.createElement("div"); d.className = "sitem" + (isLabel(it) ? " lbl" : "");
     d.innerHTML = `<div class="top"><label for="ps-c${i}">Mã số<input id="ps-c${i}" value="${esc(it.code)}"></label>
-        <label for="ps-q${i}">SL<input id="ps-q${i}" class="num" value="${esc(it.qty)}"></label>
-        <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm danger" data-a="del">Xóa mục</button></div></div>
-      <label for="ps-t${i}">Mô tả<textarea id="ps-t${i}" rows="3">${esc(it.text)}</textarea></label>`;
-    d.querySelector(`#ps-c${i}`).addEventListener("input", e => it.code = e.target.value);
-    d.querySelector(`#ps-q${i}`).addEventListener("input", e => it.qty = e.target.value.trim());
-    d.querySelector(`#ps-t${i}`).addEventListener("input", e => it.text = e.target.value);
+        <label for="ps-q${i}">SL<input id="ps-q${i}" class="num" value="${esc(it.qty)}" placeholder="nhãn"></label>
+        <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm" data-a="copy">Sao chép</button><button type="button" class="btn sm danger" data-a="del">Xóa</button></div></div>
+      <label for="ps-t${i}">${isLabel(it) ? "Nhãn nhóm (in đậm)" : "Mô tả"}<textarea id="ps-t${i}" rows="${Math.min(6, Math.max(1, String(it.text).split("\n").length))}">${esc(it.text)}</textarea></label>`;
+    d.querySelector(`#ps-c${i}`).addEventListener("input", e => { it.code = e.target.value; afterEdit(); });
+    d.querySelector(`#ps-q${i}`).addEventListener("input", e => { const was = isLabel(it); it.qty = e.target.value.trim(); afterEdit(); if (was !== isLabel(it)) { d.classList.toggle("lbl", isLabel(it)); } });
+    d.querySelector(`#ps-t${i}`).addEventListener("input", e => { it.text = e.target.value; afterEdit(); });
     d.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", () => {
       const a = b.dataset.a;
       if (a === "del") edScope.splice(i, 1);
+      if (a === "copy") edScope.splice(i + 1, 0, {...it});
       if (a === "up" && i > 0) [edScope[i-1], edScope[i]] = [edScope[i], edScope[i-1]];
       if (a === "down" && i < edScope.length - 1) [edScope[i+1], edScope[i]] = [edScope[i], edScope[i+1]];
-      renderEdScope();
+      renderEdScope(); afterEdit();
     }));
     box.appendChild(d);
   });
 }
-$("p-addScope").addEventListener("click", () => { edScope.push({code: "", text: "", qty: "1"}); renderEdScope(); });
-$("prodForm").addEventListener("submit", async e => {
-  e.preventDefault(); const s = $("p-status"); s.className = "status";
-  const name = $("p-name").value.trim();
-  if (!name) { s.className = "status err"; s.textContent = "Cần nhập dòng máy."; return; }
+function addScope(item){ edScope.push(item); renderEdScope(); afterEdit(); const t = $("ps-t" + (edScope.length - 1)); if (t) t.focus(); }
+$("p-addScope").addEventListener("click", () => addScope({code: "", text: "", qty: "1"}));
+$("p-addLabel").addEventListener("click", () => addScope({code: "", text: "", qty: ""}));
+$("p-pasteOpen").addEventListener("click", () => { $("p-pasteBox").hidden = false; $("p-paste").focus(); });
+$("p-pasteClose").addEventListener("click", () => { $("p-pasteBox").hidden = true; });
+
+/* Đọc dữ liệu copy từ Excel: tách cột bằng Tab, ô nhiều dòng nằm trong dấu ngoặc kép */
+function parseTSV(text){
+  const rows = []; let row = [], cell = "", q = false;
+  const s = String(text).replace(/\r\n?/g, "\n");
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (q) { if (ch === '"' && s[i+1] === '"') { cell += '"'; i++; } else if (ch === '"') q = false; else cell += ch; continue; }
+    if (ch === '"' && cell === "") { q = true; continue; }
+    if (ch === "\t") { row.push(cell); cell = ""; continue; }
+    if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; continue; }
+    cell += ch;
+  }
+  if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+  return rows.map(r => r.map(c => c.trim())).filter(r => r.some(Boolean));
+}
+function scopeFromRows(rows){
+  const isQty = v => /^\d+([.,]\d+)?$/.test(v);
+  return rows.map(r => {
+    let cols = r.filter((c, i) => c || (i > 0 && i < r.length - 1));
+    if (cols.length === 1 && cols[0].includes(" | ")) cols = cols[0].split(" | ").map(x => x.trim());
+    cols = cols.filter(c => c !== "");
+    if (cols.length >= 3) return {code: cols[0], text: cols[1], qty: cols[2]};
+    if (cols.length === 2) return isQty(cols[1]) ? {code: "", text: cols[0], qty: cols[1]} : {code: cols[0], text: cols[1], qty: "1"};
+    if (cols.length === 1) return /:\s*$/.test(cols[0]) ? {code: "", text: cols[0], qty: ""} : {code: "", text: cols[0], qty: "1"};
+    return null;
+  }).filter(Boolean);
+}
+$("p-pasteAdd").addEventListener("click", () => {
+  const items = scopeFromRows(parseTSV($("p-paste").value));
+  if (!items.length) { $("p-status").className = "status err"; $("p-status").textContent = "Chưa có dữ liệu để thêm."; return; }
+  edScope.push(...items); $("p-paste").value = ""; $("p-pasteBox").hidden = true;
+  renderEdScope(); afterEdit();
+  $("p-status").className = "status ok"; $("p-status").textContent = "Đã thêm " + items.length + " mục cấu hình.";
+});
+
+/* Công cụ xử lý văn bản mô tả */
+function setBody(next, msg){
+  const cur = $("p-body").value;
+  if (next === cur) { $("t-status").className = "status"; $("t-status").textContent = "Không có gì cần thay đổi."; return; }
+  bodyUndo = cur; $("t-undo").hidden = false;
+  $("p-body").value = next; $("t-status").className = "status ok"; $("t-status").textContent = msg; afterEdit();
+}
+const isBulletLine = t => /^[-–•+*]/.test(t);
+function mergeBroken(text){
+  const out = []; let n = 0;
+  for (const raw of String(text).split("\n")) {
+    const t = raw.trim();
+    if (!t) { out.push(""); continue; }
+    const prev = out.length ? out[out.length - 1] : "";
+    const cont = prev && !prev.startsWith("#") && !t.startsWith("#") && !isBulletLine(t) && !/[.:;!?)\]]$/.test(prev) && /^[a-zà-ỹđ(]/.test(t);
+    if (cont) { out[out.length - 1] = prev + " " + t; n++; } else out.push(t);
+  }
+  return {text: out.join("\n"), n};
+}
+function autoHeadings(text){
+  let n = 0;
+  const lines = String(text).split("\n").map(raw => {
+    const t = raw.trim();
+    if (!t || t.startsWith("#") || isBulletLine(t) || t.length > 70) return raw;
+    const colon = /:$/.test(t) && !/\d\s*:$/.test(t) && t.split(" ").length <= 8;
+    const caps = /[A-ZÀ-ỸĐ]/.test(t) && t === t.toLocaleUpperCase("vi") && t.replace(/[^A-Za-zÀ-ỹĐđ]/g, "").length >= 4;
+    if (colon || caps) { n++; return "# " + t; }
+    return raw;
+  });
+  return {text: lines.join("\n"), n};
+}
+function cleanLines(text){
+  const out = []; let n = 0;
+  String(text).split("\n").forEach(raw => {
+    const t = raw.replace(/\s+/g, " ").trim();
+    if (!t) { n++; return; }
+    if (out.length && out[out.length - 1] === t) { n++; return; }
+    if (t !== raw) n++;
+    out.push(t);
+  });
+  return {text: out.join("\n"), n};
+}
+$("t-merge").addEventListener("click", () => { const r = mergeBroken($("p-body").value); setBody(r.text, "Đã gộp " + r.n + " dòng bị ngắt."); });
+$("t-auto").addEventListener("click", () => { const r = autoHeadings($("p-body").value); setBody(r.text, "Đã nhận " + r.n + " tiêu đề mục. Kiểm tra lại, bỏ dấu # ở dòng không phải tiêu đề."); });
+$("t-clean").addEventListener("click", () => { const r = cleanLines($("p-body").value); setBody(r.text, "Đã dọn " + r.n + " dòng."); });
+$("t-undo").addEventListener("click", () => {
+  if (bodyUndo == null) return;
+  $("p-body").value = bodyUndo; bodyUndo = null; $("t-undo").hidden = true;
+  $("t-status").className = "status"; $("t-status").textContent = "Đã hoàn tác."; afterEdit();
+});
+$("t-head").addEventListener("click", () => {
+  const ta = $("p-body"), v = ta.value, pos = ta.selectionStart;
+  const start = v.lastIndexOf("\n", pos - 1) + 1, end = v.indexOf("\n", pos), line = v.slice(start, end < 0 ? v.length : end);
+  if (!line.trim()) { ta.setRangeText("# ", pos, pos, "end"); }
+  else if (!line.trimStart().startsWith("#")) ta.setRangeText("# " + line.trimStart(), start, end < 0 ? v.length : end, "end");
+  ta.focus(); afterEdit();
+});
+
+/* Nhập từ file Excel báo giá cũ (đọc ngay trên trình duyệt) */
+function cellText(v){
+  if (v == null) return "";
+  if (typeof v === "object") {
+    if (Array.isArray(v.richText)) return v.richText.map(r => r.text).join("");
+    if (v.text != null) return String(v.text);
+    if (v.result != null) return String(v.result);
+    return "";
+  }
+  return String(v);
+}
+function cellBold(c){
+  const v = c.value;
+  if (v && Array.isArray(v.richText)) { const runs = v.richText.filter(r => String(r.text).trim()); return runs.length > 0 && runs.every(r => r.font ? r.font.bold : c.font && c.font.bold); }
+  return !!(c.font && c.font.bold);
+}
+const STOP = /^(tổng giá trị|tổng cộng|thuế gtgt|các điều khoản|bằng chữ)/i;
+const SCOPE_START = /^(cung cấp bao gồm|cấu hình tiêu chuẩn|scope of supply|standard configuration)\s*:?\s*$/i;
+function parseQuoteWorkbook(wb){
+  const found = [];
+  wb.eachSheet(ws => {
+    const rows = [];
+    ws.eachRow({includeEmpty: false}, (row, r) => {
+      const c = row.getCell(3);
+      rows.push({r, a: cellText(row.getCell(1).value).trim(), b: cellText(row.getCell(2).value).trim(), c: cellText(c.value).replace(/\r/g, ""), cBold: cellBold(c), d: cellText(row.getCell(4).value).trim()});
+    });
+    const isHeader = x => x.cBold && (/\n\s*model\s*:/i.test(x.c) || (/^\s*model\s*:/im.test(x.c) && /(nsx|nhà sản xuất|xuất xứ)\s*:/i.test(x.c)));
+    const starts = rows.map((x, i) => isHeader(x) ? i : -1).filter(i => i >= 0);
+    starts.forEach((si, k) => {
+      const h = rows[si], lines = h.c.split("\n").map(s => s.trim()).filter(Boolean);
+      const pick = re => { const l = lines.find(x => re.test(x)); return l ? l.replace(re, "").trim() : ""; };
+      const p = {name: lines.find(l => !/^(model|nsx|nhà sản xuất|hãng|xuất xứ|mã)\s*:/i.test(l)) || "",
+        model: pick(/^model\s*:\s*/i), maker: pick(/^(nsx|nhà sản xuất|hãng)\s*:\s*/i), origin: pick(/^xuất xứ\s*:\s*/i),
+        code: h.b, sections: [], scope: [], sheet: ws.name};
+      let cur = null, mode = "desc";
+      const end = k + 1 < starts.length ? starts[k + 1] : rows.length;
+      for (let i = si + 1; i < end; i++) {
+        const x = rows[i], c = x.c.trim();
+        if (STOP.test(x.a) || STOP.test(c)) break;
+        if (!c && !x.b) continue;
+        if (SCOPE_START.test(c)) { mode = "scope"; continue; }
+        if (mode === "desc") {
+          if (x.cBold && !c.includes("\n") && c.length <= 120) { cur = {title: c, lines: []}; p.sections.push(cur); continue; }
+          if (!cur) { cur = {title: "", lines: []}; p.sections.push(cur); }
+          c.split("\n").map(s => s.trim()).filter(Boolean).forEach(s => cur.lines.push(s));
+        } else {
+          const qty = x.d && !/^0$/.test(x.d) ? x.d : "";
+          p.scope.push({code: x.b, text: c.replace(/^\s*-\s+/, ""), qty: qty});
+        }
+      }
+      found.push(p);
+    });
+  });
+  return found;
+}
+function useImported(p){
+  editingId = null; $("p-title").textContent = "Thêm model (từ file Excel)"; $("p-del").hidden = true; $("p-dup").hidden = true;
+  fillEditor(p); edDirty = true; saveDraft();
+  const missing = [["Dòng máy", p.name], ["Hãng", p.maker], ["Model", p.model], ["Xuất xứ", p.origin]].filter(x => !x[1]).map(x => x[0]);
+  const ns = p.sections.filter(s => s.title).length, nc = p.scope.filter(s => !isLabel(s)).length;
+  $("p-xlsxStatus").className = missing.length ? "status err" : "status ok";
+  $("p-xlsxStatus").textContent = "Đã đọc " + ns + " mục mô tả, " + nc + " mục cấu hình." + (missing.length ? " Còn trống: " + missing.join(", ") + "." : "") + " Kiểm tra lại rồi bấm Lưu.";
+}
+$("p-xlsx").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  const st = $("p-xlsxStatus"); st.className = "status"; st.textContent = "Đang đọc " + file.name + "…";
+  $("p-xlsxPick").hidden = true; $("p-xlsxUse").hidden = true;
+  try {
+    if (!window.ExcelJS) throw new Error("Thư viện đọc Excel chưa tải xong. Tải lại trang rồi thử lại.");
+    const wb = new ExcelJS.Workbook(); await wb.xlsx.load(await file.arrayBuffer());
+    xlsxFound = parseQuoteWorkbook(wb);
+    if (!xlsxFound.length) throw new Error("Không tìm thấy dòng máy nào. File cần có ô mô tả dạng \"Tên máy / Model: … / NSX: …\" ở cột C như form SatiCus.");
+    if (xlsxFound.length === 1) { useImported(xlsxFound[0]); return; }
+    $("p-xlsxPick").innerHTML = xlsxFound.map((p, i) => `<option value="${i}">${esc([p.name, p.maker, p.model].filter(Boolean).join(" · ") || "Mục " + (i + 1))}${xlsxFound.length > 1 && p.sheet ? " (" + esc(p.sheet) + ")" : ""}</option>`).join("");
+    $("p-xlsxPick").hidden = false; $("p-xlsxUse").hidden = false;
+    st.textContent = "File có " + xlsxFound.length + " model. Chọn model cần nhập rồi bấm Dùng model này.";
+  } catch (err) { st.className = "status err"; st.textContent = err.message || "Không đọc được file."; }
+});
+$("p-xlsxUse").addEventListener("click", () => { const p = xlsxFound[+$("p-xlsxPick").value]; if (p) useImported(p); });
+
+/* Nhân bản */
+$("p-dup").addEventListener("click", () => {
+  const src = products.get(editingId); if (!src) return;
+  editingId = null; dupAck = false;
+  $("p-title").textContent = "Thêm model (nhân bản)"; $("p-sub").textContent = "Nhân bản từ " + [src.name, src.maker, src.model].filter(Boolean).join(" · ") + ". Sửa model và các thông số khác rồi lưu.";
+  $("p-del").hidden = true; $("p-dup").hidden = true; $("p-model").value = ""; $("p-code").value = "";
+  afterEdit(); $("p-model").focus();
+  $("p-status").className = "status"; $("p-status").textContent = "Đã nhân bản. Nhập model mới.";
+});
+
+/* Lưu */
+async function saveEditor(next){
+  const s = $("p-status"); s.className = "status";
+  const d = readEditor();
+  const miss = [["Dòng máy", d.name], ["Hãng", d.maker], ["Model", d.model]].filter(x => !x[1]).map(x => x[0]);
+  if (miss.length) { s.className = "status err"; s.textContent = "Cần nhập: " + miss.join(", ") + "."; ({"Dòng máy": $("p-name"), "Hãng": $("p-maker"), "Model": $("p-model")})[miss[0]].focus(); return; }
+  if (checkDup() && !dupAck) { dupAck = true; s.className = "status err"; s.textContent = "Model này đã có trong thư viện. Bấm Lưu lần nữa nếu vẫn muốn lưu thêm."; return; }
   s.textContent = "Đang lưu…";
   try {
-    const scope = edScope.filter(it => String(it.text).trim() || String(it.code).trim())
-      .map(it => ({code: String(it.code).trim(), text: String(it.text).replace(/\s+$/, ""), qty: String(it.qty ?? "").trim()}));
-    const data = {name, maker: $("p-maker").value.trim(), model: $("p-model").value.trim(), code: $("p-code").value.trim(),
-      origin: $("p-origin").value.trim(), sections: parseBody($("p-body").value), scope};
-    if (editingId) data.id = editingId;
-    const {data: saved, error} = await sb.from("quote_products").upsert(data).select().single();
+    if (editingId) d.id = editingId;
+    const {data: saved, error} = await sb.from("quote_products").upsert(d).select().single();
     if (error) throw error;
-    editingId = saved.id; delete lines[saved.id];
-    await loadProducts(); s.className = "status ok"; s.textContent = "Đã lưu."; $("p-del").hidden = false; $("p-title").textContent = "Sửa model";
+    delete lines[saved.id]; clearDraft(); edDirty = false; $("p-draft").hidden = true;
+    await loadProducts();
+    if (next) { openEditor(null, {name: d.name, maker: d.maker, origin: d.origin}); $("p-status").className = "status ok"; $("p-status").textContent = "Đã lưu " + d.model + ". Nhập model tiếp theo."; $("p-model").focus(); return; }
+    editingId = saved.id; $("p-title").textContent = "Sửa model"; $("p-sub").textContent = [d.name, d.maker].join(" · ");
+    $("p-del").hidden = false; $("p-dup").hidden = false; fillEditor(d);
+    s.className = "status ok"; s.textContent = "Đã lưu.";
   } catch (err) { s.className = "status err"; s.textContent = "Lưu không thành công: " + (err.message || "thử lại sau ít phút."); }
-});
+}
+$("prodForm").addEventListener("submit", e => { e.preventDefault(); saveEditor(false); });
+$("p-saveNext").addEventListener("click", () => saveEditor(true));
 $("p-del").addEventListener("click", () => $("p-confirm").hidden = false);
 $("p-confirmNo").addEventListener("click", () => $("p-confirm").hidden = true);
 $("p-confirmYes").addEventListener("click", async () => {
   if (!editingId) return;
   try {
     const {error} = await sb.from("quote_products").delete().eq("id", editingId); if (error) throw error;
-    selected = selected.filter(x => x !== editingId); LS.set("bg_sel", selected);
+    selected = selected.filter(x => x !== editingId); LS.set("bg_sel", selected); clearDraft(); edDirty = false;
     await loadProducts(); show("lib");
   } catch (err) { $("p-status").className = "status err"; $("p-status").textContent = "Không xóa được: " + (err.message || ""); }
 });
+
+/* Không rời trang khi còn thay đổi chưa lưu */
+function guard(fn){
+  if (view === "edit" && edDirty) { pendingNav = fn; $("p-leave").hidden = false; window.scrollTo(0, 0); return; }
+  fn();
+}
+$("p-leaveYes").addEventListener("click", () => { $("p-leave").hidden = true; edDirty = false; const f = pendingNav; pendingNav = null; if (f) f(); });
+$("p-leaveNo").addEventListener("click", () => { $("p-leave").hidden = true; pendingNav = null; });
+window.addEventListener("beforeunload", e => { if (view === "edit" && edDirty) { e.preventDefault(); e.returnValue = ""; } });
 
 /* ---------- Cài đặt ---------- */
 const SF = {co: "companyName", hdr: "header", intro: "intro", signTitle: "signTitle", signName: "signName"};
