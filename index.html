@@ -5,119 +5,148 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Báo giá SatiCus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
-/* Layout: thanh trên cùng; Thư viện = cột bộ lọc + danh sách dòng máy > hãng > model, thanh chọn dính đáy;
-   Xuất báo giá = form bên trái + tờ báo giá xem trước bên phải */
+/* Giao diện đồng nhất với GOR (Alex workspace): sidebar trắng bên trái, nền xám nhạt, thẻ trắng bo 18px,
+   nút dạng viên thuốc, menu đang chọn nền đen. GOR chỉ có giao diện sáng nên trang này cũng chỉ dùng giao diện sáng. */
 :root{
-  --bg:#eef2f3; --surface:#ffffff; --line:#d3dcdf; --fg:#17262b; --muted:#5b6f75;
-  --accent:#0f5f6e; --accent-ink:#ffffff; --accent-soft:#dcecef; --danger:#b3402f; --sel:#e9f4f6;
-  --paper:#ffffff; --ink:#1a1a1a; --paper-line:#7a8a8f; --paper-head:#0f5f6e;
-  --f-ui:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+  --bg:#f2f2f4; --surface:#ffffff; --soft:#f7f7f8; --track:#ececef;
+  --line:#e7e7ea; --line2:#e2e2e6;
+  --fg:#131315; --ink:#0c0c0e; --title:#333338; --muted:#75757e; --muted2:#6b6b73;
+  --green:#1f7a4d; --red:#c23f34; --olive:#956a17;
+  --shadow:0 1px 3px rgba(20,20,30,.05),0 1px 2px rgba(20,20,30,.04);
+  --f-ui:-apple-system,"system-ui",BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
   --f-doc:"Tinos","Times New Roman",Times,serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --paper:#ffffff; --ink-doc:#1a1a1a; --paper-line:#7a8a8f; --paper-head:#0f5f6e;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1719; --surface:#172225; --line:#2b3b3f; --fg:#e4eef0; --muted:#97abb0;
-  --accent:#4fb3c4; --accent-ink:#06191d; --accent-soft:#18363c; --danger:#e07a68; --sel:#14323a; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f1719; --surface:#172225; --line:#2b3b3f; --fg:#e4eef0; --muted:#97abb0;
-  --accent:#4fb3c4; --accent-ink:#06191d; --accent-soft:#18363c; --danger:#e07a68; --sel:#14323a; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.5}
-.wrap{max-width:1360px;margin:0 auto;padding-inline:16px;padding-block:0 120px}
-header.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;padding-block:12px}
-.brand{display:flex;flex-direction:column;line-height:1.2}
-.brand b{font-size:17px}
-.brand span{font-size:12px;color:var(--muted)}
-nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
-nav.tabs button{font:inherit;font-weight:500;border:1px solid transparent;background:none;color:var(--muted);padding:7px 14px;border-radius:6px;cursor:pointer}
-nav.tabs button[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--fg)}
-.who{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.banner{margin-top:16px;padding:10px 14px;border-radius:6px;background:var(--accent-soft);font-size:13px;border-left:3px solid var(--danger)}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.panel h2{margin:0;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14px;line-height:1.45}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Khung ứng dụng */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 14px}
+.logo{display:flex;align-items:center;gap:12px;padding:6px 4px 0}
+.logo-tile{width:40px;height:40px;flex:none;border-radius:10px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35);display:grid;place-items:center;font-family:var(--f-doc);font-weight:700;font-size:11px;letter-spacing:.04em;color:var(--ink)}
+.logo b{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.logo small{display:block;font-size:11.5px;color:var(--muted);font-weight:500;margin-top:-2px}
+.me{padding:22px 8px 14px}
+.me b{display:block;font-size:17px;font-weight:700;line-height:1.25}
+.badge{display:inline-block;margin-top:6px;background:var(--bg);color:var(--ink);border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700}
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.nav button,.nav a{all:unset;box-sizing:border-box;cursor:pointer;display:block;padding:10px 14px;border-radius:11px;font-size:13.5px;font-weight:500;color:var(--muted2)}
+.nav button:hover,.nav a:hover{background:var(--soft);color:var(--fg)}
+.nav button[aria-current="page"]{background:var(--ink);color:var(--bg);font-weight:600}
+.nav button:focus-visible,.nav a:focus-visible{outline:2px solid var(--ink)}
+.side-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.side-foot .btn{width:100%;justify-content:center}
+.main{min-width:0;padding:18px 32px 120px}
+.topbar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:18px}
+.pill{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:11.5px;color:var(--muted)}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 16px;border-right:0;border-bottom:1px solid var(--line)}
+  .me{display:none}.nav{flex-direction:row;flex-wrap:wrap;margin:0}.side-foot{margin:0 0 0 auto;border:0;padding:0;flex-direction:row}
+  .side-foot .btn{width:auto}
+  .main{padding:16px 16px 120px}
+}
+
+/* Thành phần chung */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{margin:0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--title)}
 fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
-legend{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);padding:0;margin-bottom:8px}
+legend{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--title);padding:0;margin-bottom:10px}
 .sep{border-top:1px solid var(--line)}
-label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);font-weight:500;min-width:0}
-input,select,textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
-input[type=checkbox]{width:auto;accent-color:var(--accent);margin:0}
+label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:500;min-width:0}
+input,select,textarea{font:inherit;font-size:13.5px;color:var(--fg);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%;min-width:0}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:var(--ink);margin:0}
 textarea{resize:vertical;line-height:1.45}
 textarea.code{font-family:var(--f-mono);font-size:12.5px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
-.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.num{font-variant-numeric:tabular-nums;text-align:right}
 .hint{font-size:12px;color:var(--muted);margin:0}
 .btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.btn{text-decoration:none;display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:600;font-size:13.5px;border-radius:6px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
-.btn.sm{font-size:12.5px;padding:5px 10px;font-weight:500}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.danger{color:var(--danger)}
-.btn.ghost{background:none;border-color:transparent}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn{text-decoration:none;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:600;line-height:1;border-radius:999px;padding:8px 16px;min-height:31px;cursor:pointer;border:1px solid var(--line2);background:transparent;color:var(--fg)}
+.btn:hover{background:var(--soft)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.primary:hover{background:#2a2a2e}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.ghost{border-color:transparent;color:var(--muted2);padding-inline:8px}
+.btn.sm{padding:6px 12px;min-height:27px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .status{font-size:12.5px;color:var(--muted);min-height:1.2em;margin:0}
-.status.err{color:var(--danger)}
-code{font-family:var(--f-mono);font-size:12px;background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+.status.err{color:var(--red)}
+.status.ok{color:var(--green)}
+.banner{margin-bottom:16px;padding:12px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--red);color:var(--red);font-size:13px}
+code{font-family:var(--f-mono);font-size:12px;background:var(--bg);padding:1px 6px;border-radius:6px}
+.pagehead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:16px}
+.pagehead h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.01em}
+.pagehead p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
 
 /* Đăng nhập */
 .login{min-height:100vh;display:grid;place-items:center;padding-inline:16px}
 .login form{width:100%;max-width:380px}
 
 /* Thư viện */
-.lib{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:24px;margin-top:20px;align-items:start}
-@media (max-width:860px){.lib{grid-template-columns:minmax(0,1fr)}}
-.filters{position:sticky;top:76px}
-@media (max-width:860px){.filters{position:static}}
+.lib{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1100px){.lib{grid-template-columns:minmax(0,1fr)}}
+.filters{position:sticky;top:18px}
+@media (max-width:1100px){.filters{position:static}}
 .flist{display:flex;flex-direction:column;gap:2px}
-@media (max-width:860px){.flist{flex-direction:row;flex-wrap:wrap;gap:6px}}
-.fbtn{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13.5px}
-.fbtn:hover{background:var(--bg)}
-.fbtn[aria-pressed="true"]{background:var(--accent-soft);color:var(--fg);font-weight:600}
-.fbtn .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.fbtn:focus-visible{outline:2px solid var(--accent)}
-@media (max-width:860px){.fbtn{border:1px solid var(--line)}}
-.libhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-.libhead .search{flex:1 1 260px;max-width:420px}
-.count{font-size:13px;color:var(--muted)}
-.cat{display:flex;flex-direction:column;gap:12px}
-.cat > h3{margin:0;font-size:18px;display:flex;align-items:baseline;gap:10px;text-wrap:balance}
-.cat > h3 span{font-size:12.5px;font-weight:500;color:var(--muted)}
-.brandbox{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
-.brandbox > header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.mrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
-.mrow:last-child{border-bottom:0}
-.mrow:hover{background:var(--bg)}
-.mrow.on{background:var(--sel)}
-.mrow .m{font-family:var(--f-mono);font-weight:500;font-size:14px}
-.mrow .meta{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:8px}
-.selbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.06);padding-bottom:env(safe-area-inset-bottom,0px)}
-.selbar .wrap{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding-block:12px}
+@media (max-width:1100px){.flist{flex-direction:row;flex-wrap:wrap;gap:6px}}
+.fbtn{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:11px;cursor:pointer;font-size:13px;color:var(--muted2);font-weight:500}
+.fbtn:hover{background:var(--soft);color:var(--fg)}
+.fbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.fbtn .n{font-variant-numeric:tabular-nums;font-size:12px;opacity:.75}
+.fbtn:focus-visible{outline:2px solid var(--ink)}
+@media (max-width:1100px){.fbtn{border:1px solid var(--line2);border-radius:999px;padding:6px 12px}}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toolbar .search{flex:1 1 260px;background:var(--surface)}
+.count{font-size:12.5px;color:var(--muted)}
+.cat{display:flex;flex-direction:column;gap:10px}
+.cat > h3{margin:4px 0 0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--title);display:flex;align-items:baseline;gap:10px}
+.cat > h3 span{font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted)}
+.brandbox{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.brandbox > header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px 8px;font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.brandbox > header b{color:var(--fg);font-size:14px;letter-spacing:0;text-transform:none;font-weight:700}
+.mrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--line);cursor:pointer}
+.mrow:hover{background:var(--soft)}
+.mrow.on{background:var(--bg)}
+.mrow .m{font-weight:700;font-size:14px}
+.mrow .meta{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{padding:28px;text-align:center;color:var(--muted);font-size:13px;background:var(--surface);border:1px dashed var(--line2);border-radius:18px}
+.selbar{position:fixed;left:236px;right:0;bottom:0;z-index:6;padding:0 32px 16px;pointer-events:none}
+@media (max-width:900px){.selbar{left:0;padding:0 16px 12px}}
+.selbar .inner{pointer-events:auto;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--ink);color:var(--bg);border-radius:18px;padding:12px 14px 12px 20px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .selbar .txt{flex:1 1 240px;min-width:0;font-size:13.5px}
-.selbar .txt small{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.selbar .txt small{display:block;color:#a9a9b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.selbar .btn{border-color:#3a3a40;color:var(--bg)}
+.selbar .btn:hover{background:#222226}
+.selbar .btn.primary{background:var(--bg);color:var(--ink);border-color:var(--bg)}
 
 /* Xuất báo giá */
-.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:24px;margin-top:16px;align-items:start}
-@media (max-width:1000px){.grid{grid-template-columns:minmax(0,1fr)}}
-.item{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
-.item .t{font-weight:600;font-size:13.5px;display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
-.item .t small{display:block;font-weight:400;color:var(--muted);font-family:var(--f-mono);font-size:12px}
-.totals{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13px;padding:10px 12px;border-radius:6px;background:var(--accent-soft)}
-.totals b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500}
-.totals .big{font-weight:700}
-details.box{border:1px solid var(--line);border-radius:6px;padding:8px 12px}
-details.box summary{cursor:pointer;font-size:13px;font-weight:600}
+.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1200px){.grid{grid-template-columns:minmax(0,1fr)}}
+.item{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.item .t{font-weight:700;font-size:13.5px;display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
+.item .t small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.totals{display:grid;grid-template-columns:1fr auto;gap:3px 12px;font-size:12.5px;padding:12px 14px;border-radius:14px;background:var(--bg);color:var(--muted)}
+.totals b{font-variant-numeric:tabular-nums;text-align:right;font-weight:600;color:var(--fg)}
+.totals .big{font-weight:800;color:var(--fg);font-size:14px}
+details.box{border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--surface)}
+details.box summary{cursor:pointer;font-size:12.5px;font-weight:600}
 details.box[open] summary{margin-bottom:10px}
 .scope-q{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
-.scope-q .it{display:grid;grid-template-columns:auto minmax(0,1fr) 60px;gap:8px;align-items:center;font-size:13px}
+.scope-q .it{display:grid;grid-template-columns:auto minmax(0,1fr) 60px;gap:8px;align-items:center;font-size:12.5px}
 .scope-q .it span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scope-q .it input.num{padding:4px 6px}
-.scope-q .lbl{font-size:12px;color:var(--muted);font-weight:600;padding-top:4px}
-.preview-shell{overflow-x:auto;min-width:0;border-radius:8px;background:var(--line);padding:18px}
-.paper{background:var(--paper);color:var(--ink);font-family:var(--f-doc);font-size:13px;line-height:1.35;width:780px;margin:0 auto;padding:36px 40px 48px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.scope-q .lbl{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding-top:4px}
+.preview-shell{overflow-x:auto;min-width:0;border-radius:18px;background:var(--track);padding:18px;border:1px solid var(--line)}
+.paper{background:var(--paper);color:var(--ink-doc);font-family:var(--f-doc);font-size:13px;line-height:1.35;width:780px;margin:0 auto;padding:36px 40px 48px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .paper .co{font-weight:700;font-size:16px;color:var(--paper-head)}
 .paper .co-sub{font-size:11.5px;white-space:pre-line}
 .paper .rule{border-bottom:2px solid var(--paper-head);margin:8px 0 14px}
@@ -143,44 +172,52 @@ details.box[open] summary{margin-bottom:10px}
 .paper .sign .space{height:80px}
 
 /* Sửa model */
-.editor{max-width:860px;margin-top:16px}
+.editor{max-width:900px}
 .scope-ed{display:flex;flex-direction:column;gap:10px}
-.sitem{border:1px solid var(--line);border-radius:6px;padding:10px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.sitem{border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
 .sitem .top{display:grid;grid-template-columns:minmax(0,1fr) 80px auto;gap:8px;align-items:end}
-@media (max-width:520px){.sitem .top{grid-template-columns:minmax(0,1fr) 80px}}
-.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--danger);border-radius:6px;font-size:13px}
-.back{margin-top:16px}
+@media (max-width:560px){.sitem .top{grid-template-columns:minmax(0,1fr) 80px}}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;border:1px solid var(--red);border-radius:14px;font-size:13px;color:var(--red)}
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);text-align:center;font-size:11.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+
 </head>
 <body>
 
 <section class="login" id="loginView" hidden>
   <form class="panel" id="loginForm" autocomplete="on">
-    <div class="brand"><b>Báo giá SatiCus</b><span>Đăng nhập bằng tài khoản Alex workspace</span></div>
+    <div class="logo"><div class="logo-tile" aria-hidden="true">GOR</div><div><b>GOR</b><small>Báo giá</small></div></div>
+    <p class="hint">Đăng nhập bằng tài khoản GOR.</p>
     <label for="lg-user">Tên đăng nhập<input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
     <label for="lg-pass">Mật khẩu<input id="lg-pass" type="password" autocomplete="current-password" required></label>
     <div class="btns"><button class="btn primary" type="submit" id="lg-btn">Đăng nhập</button></div>
-    <p class="hint">Dùng cùng tên đăng nhập và mật khẩu với Alex workspace. Quên mật khẩu thì khôi phục trong Alex workspace.</p>
+    <p class="hint">Dùng cùng tên đăng nhập và mật khẩu với GOR. Quên mật khẩu thì khôi phục trong GOR.</p>
     <p class="status" id="lg-status" role="status"></p>
   </form>
 </section>
 
-<div id="appView" hidden>
-<header class="top"><div class="wrap">
-  <div class="brand"><b>Báo giá SatiCus</b><span>Thư viện báo giá theo dòng máy và hãng</span></div>
-  <nav class="tabs" role="tablist">
-    <button role="tab" id="tab-lib" aria-selected="true" data-view="lib">Thư viện báo giá</button>
-    <button role="tab" id="tab-set" aria-selected="false" data-view="set">Cài đặt</button>
+<div id="appView" class="shell" hidden>
+<aside class="side" aria-label="Điều hướng">
+  <div class="logo"><div class="logo-tile" aria-hidden="true">GOR</div><div><b>GOR</b><small>Báo giá</small></div></div>
+  <div class="me"><b id="meName">…</b><span class="badge" id="meRole" hidden></span></div>
+  <nav class="nav">
+    <button type="button" id="nav-lib" aria-current="page">Thư viện báo giá</button>
+    <button type="button" id="nav-quote">Xuất báo giá <span id="nav-n"></span></button>
+    <button type="button" id="nav-new">Thêm model</button>
+    <button type="button" id="nav-set">Cài đặt</button>
+    <a id="nav-gor" href="https://alex-workspace.pages.dev/app">← Về GOR</a>
   </nav>
-  <div class="who"><span id="whoEmail"></span><button class="btn sm" type="button" id="logout">Đăng xuất</button></div>
-</div></header>
+  <div class="side-foot"><button class="btn" type="button" id="logout">Đăng xuất</button></div>
+</aside>
+<main class="main">
+  <div class="topbar"><span class="pill" id="todayPill"></span></div>
 
-<main class="wrap">
   <div id="dbBanner" class="banner" hidden></div>
 
   <!-- THƯ VIỆN BÁO GIÁ -->
   <section id="view-lib">
+    <div class="pagehead"><div><h1>Thư viện báo giá</h1><p>Lọc theo dòng máy hoặc hãng, tick model rồi bấm Xuất báo giá.</p></div></div>
     <div class="lib">
       <aside class="panel filters" aria-label="Bộ lọc">
         <h2>Dòng máy</h2>
@@ -190,9 +227,9 @@ details.box[open] summary{margin-bottom:10px}
         <div class="flist" id="f-brand"></div>
       </aside>
       <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
-        <div class="libhead">
-          <input class="search" id="l-search" type="search" placeholder="Tìm model, dòng máy, hãng, mã số" aria-label="Tìm trong thư viện">
-          <div class="btns"><span class="count" id="l-count"></span><button class="btn" type="button" id="l-new">Thêm model</button></div>
+        <div class="toolbar">
+          <input class="search" id="l-search" type="search" placeholder="Tìm model / dòng máy / hãng / mã số…" aria-label="Tìm trong thư viện">
+          <span class="count" id="l-count"></span><button class="btn" type="button" id="l-new">+ Thêm model</button>
         </div>
         <div id="l-list" style="display:flex;flex-direction:column;gap:26px"></div>
       </div>
@@ -201,7 +238,8 @@ details.box[open] summary{margin-bottom:10px}
 
   <!-- XUẤT BÁO GIÁ -->
   <section id="view-quote" hidden>
-    <div class="back"><button class="btn ghost" type="button" id="q-back">← Quay lại thư viện</button></div>
+    <div class="pagehead"><div><h1>Xuất báo giá</h1><p>Điền số lượng, đơn giá và thông tin khách, xem trước bên phải rồi tải file Excel.</p></div>
+      <button class="btn" type="button" id="q-back">← Thư viện</button></div>
     <div class="grid">
       <form class="panel" id="quoteForm" autocomplete="off">
         <fieldset>
@@ -246,9 +284,9 @@ details.box[open] summary{margin-bottom:10px}
 
   <!-- THÊM / SỬA MODEL -->
   <section id="view-edit" hidden>
-    <div class="back"><button class="btn ghost" type="button" id="p-back">← Quay lại thư viện</button></div>
+    <div class="pagehead"><div><h1 id="p-title">Thêm model</h1><p>Dòng máy và hãng dùng để nhóm, lọc trong thư viện.</p></div>
+      <button class="btn" type="button" id="p-back">← Thư viện</button></div>
     <form class="panel editor" id="prodForm" autocomplete="off">
-      <h2 id="p-title">Thêm model</h2>
       <div class="row">
         <label for="p-name">Dòng máy<input id="p-name" list="dl-cat" placeholder="VD: Máy Rửa Dụng Cụ" required></label>
         <label for="p-maker">Hãng (NSX)<input id="p-maker" list="dl-brand" placeholder="VD: Eurping"></label>
@@ -283,7 +321,8 @@ details.box[open] summary{margin-bottom:10px}
 
   <!-- CÀI ĐẶT -->
   <section id="view-set" hidden>
-    <form class="panel" id="setForm" style="max-width:760px;margin-top:20px" autocomplete="off">
+    <div class="pagehead"><div><h1>Cài đặt</h1><p>Thông tin in trên mọi báo giá. Chỉ Admin và Super Admin sửa được.</p></div></div>
+    <form class="panel" id="setForm" style="max-width:760px" autocomplete="off">
       <h2>Phần đầu báo giá</h2>
       <label for="s-co">Tên công ty<input id="s-co"></label>
       <label for="s-hdr">Thông tin văn phòng, liên hệ (in dưới tên công ty)<textarea id="s-hdr" rows="9"></textarea></label>
@@ -300,10 +339,11 @@ details.box[open] summary{margin-bottom:10px}
       <p class="status" id="s-status" role="status"></p>
     </form>
   </section>
+  <div class="foot">© 2026 Nguyễn Huỳnh Anh (Alex Nguyen). Thuộc bộ công cụ GOR.</div>
 </main>
 
 <div class="selbar" id="selbar" hidden>
-  <div class="wrap">
+  <div class="inner">
     <div class="txt"><b id="sel-n"></b><small id="sel-list"></small></div>
     <div class="btns"><button class="btn" type="button" id="sel-clear">Bỏ chọn</button><button class="btn primary" type="button" id="sel-go">Xuất báo giá →</button></div>
   </div>
@@ -522,12 +562,14 @@ let editingId = null, edScope = [], view = "lib";
 function show(v){
   view = v;
   ["lib","quote","edit","set"].forEach(x => $("view-" + x).hidden = x !== v);
-  $("tab-lib").setAttribute("aria-selected", String(v !== "set"));
-  $("tab-set").setAttribute("aria-selected", String(v === "set"));
+  const cur = {lib: "nav-lib", quote: "nav-quote", edit: editingId ? "" : "nav-new", set: "nav-set"}[v];
+  ["nav-lib","nav-quote","nav-new","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
 }
-$("tab-lib").addEventListener("click", () => show("lib"));
-$("tab-set").addEventListener("click", () => show("set"));
+$("nav-lib").addEventListener("click", () => show("lib"));
+$("nav-set").addEventListener("click", () => show("set"));
+$("nav-new").addEventListener("click", () => openEditor(null));
+$("nav-quote").addEventListener("click", () => openQuote());
 $("q-back").addEventListener("click", () => show("lib"));
 $("p-back").addEventListener("click", () => show("lib"));
 
@@ -571,7 +613,7 @@ function renderLib(){
     sec.innerHTML = `<h3>${esc(cname)}<span>${brands.size} hãng · ${n} model</span></h3>`;
     [...brands.keys()].sort(vsort).forEach(bn => {
       const bx = document.createElement("div"); bx.className = "brandbox";
-      bx.innerHTML = `<header><span>${esc(bn)}</span><span>${brands.get(bn).length} model</span></header>`;
+      bx.innerHTML = `<header><b>${esc(bn)}</b><span>${brands.get(bn).length} model</span></header>`;
       brands.get(bn).sort((a, b) => vsort(a.model || "", b.model || "")).forEach(p => {
         const on = selected.includes(p.id), row = document.createElement("div");
         row.className = "mrow" + (on ? " on" : "");
@@ -602,6 +644,7 @@ function toggleSel(id){
 }
 function renderSelbar(){
   selected = selected.filter(id => products.has(id) || !products.size);
+  $("nav-n").textContent = selected.length ? "(" + selected.length + ")" : "";
   const show = view === "lib" && selected.length > 0 && products.size > 0;
   $("selbar").hidden = !show; if (!show) return;
   $("sel-n").textContent = "Đã chọn " + selected.length + " model";
@@ -735,7 +778,7 @@ $("quoteForm").addEventListener("submit", async e => {
     const url = URL.createObjectURL(new Blob([buf], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
     const a = document.createElement("a"); a.href = url; a.download = fileName(items, q); document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-    s.textContent = "Đã tải " + fileName(items, q);
+    s.className = "status ok"; s.textContent = "Đã tải " + fileName(items, q);
   } catch (err) { s.className = "status err"; s.textContent = (err && err.message) || "Không tạo được file."; }
 });
 
@@ -787,7 +830,7 @@ $("prodForm").addEventListener("submit", async e => {
     const {data: saved, error} = await sb.from("quote_products").upsert(data).select().single();
     if (error) throw error;
     editingId = saved.id; delete lines[saved.id];
-    await loadProducts(); s.textContent = "Đã lưu."; $("p-del").hidden = false; $("p-title").textContent = "Sửa model";
+    await loadProducts(); s.className = "status ok"; s.textContent = "Đã lưu."; $("p-del").hidden = false; $("p-title").textContent = "Sửa model";
   } catch (err) { s.className = "status err"; s.textContent = "Lưu không thành công: " + (err.message || "thử lại sau ít phút."); }
 });
 $("p-del").addEventListener("click", () => $("p-confirm").hidden = false);
@@ -807,7 +850,7 @@ function fillSettings(){
   Object.entries(SF).forEach(([k, f]) => $("s-" + k).value = settings[f] || "");
   $("s-vat").value = settings.vat; $("s-terms").value = settings.terms;
   const ro = !canAdmin; document.querySelectorAll("#setForm input,#setForm textarea").forEach(el => el.readOnly = ro);
-  $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ admin hoặc super_admin sửa được cài đặt." : "";
+  $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ Admin hoặc Super Admin sửa được cài đặt." : "";
 }
 $("setForm").addEventListener("submit", async e => {
   e.preventDefault(); const s = $("s-status");
@@ -816,7 +859,7 @@ $("setForm").addEventListener("submit", async e => {
   s.className = "status"; s.textContent = "Đang lưu…";
   try { const {data: rows, error} = await sb.from("quote_settings").upsert({id: "company", data}).select();
     if (error || !rows || !rows.length) throw error || new Error("Bạn không có quyền sửa cài đặt.");
-    applySettings(data); s.textContent = "Đã lưu. Báo giá mới sẽ dùng thông tin này."; }
+    applySettings(data); s.className = "status ok"; s.textContent = "Đã lưu. Báo giá mới sẽ dùng thông tin này."; }
   catch (err) { s.className = "status err"; s.textContent = /row-level|permission|quyền/i.test(err.message||"") ? "Bạn không có quyền sửa cài đặt." : "Lưu không thành công: " + (err.message || ""); }
 });
 
@@ -844,11 +887,15 @@ async function loadSettings(){
 let channel = null, entered = false;
 async function enterApp(){
   $("loginView").hidden = true; $("appView").hidden = false;
-  $("whoEmail").textContent = session.user.email && !/internal\.saticus\.local$/.test(session.user.email) ? session.user.email : "";
   if (entered) return; entered = true;
   show("lib"); renderLib();
+  const d = new Date(); $("todayPill").textContent = "Hôm nay: " + String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
   const {data: role} = await sb.rpc("get_my_role");
   canAdmin = role === "admin" || role === "super_admin"; fillSettings();
+  const ROLES = {super_admin: "Super Admin", admin: "Admin", manager: "Manager", user: "User", cto_coo: "CTO/COO"};
+  if (role) { $("meRole").textContent = ROLES[role] || role; $("meRole").hidden = false; }
+  const {data: prof} = await sb.from("profiles").select("full_name").eq("id", session.user.id).maybeSingle();
+  $("meName").textContent = (prof && prof.full_name) || (session.user.email || "").split("@")[0];
   await Promise.all([loadSettings(), loadProducts()]);
   channel = sb.channel("bao-gia")
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_products"}, () => loadProducts())
