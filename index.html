@@ -147,19 +147,20 @@ details.box[open] summary{margin-bottom:10px}
 .scope-q .lbl{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding-top:4px}
 .preview-shell{overflow-x:auto;min-width:0;border-radius:18px;background:var(--track);padding:18px;border:1px solid var(--line)}
 .paper{background:var(--paper);color:var(--ink-doc);font-family:var(--f-doc);font-size:13px;line-height:1.35;width:780px;margin:0 auto;padding:36px 40px 48px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
-.paper .phead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.paper .phead{display:flex;justify-content:space-between;align-items:center;gap:18px}
 .paper .pco{min-width:0}
-.paper .plogo{width:96px;height:auto;flex:none}
-.paper .co{font-weight:700;font-size:16px;color:var(--paper-head)}
-.paper .co-sub{font-size:11px;white-space:pre-line;color:#3a3a40;margin-top:2px}
-.paper .rule{border-top:4px solid var(--paper-head);border-bottom:2.5px solid var(--paper-accent);margin:10px 0 14px}
-.paper h1{text-align:center;font-size:22px;letter-spacing:.06em;margin:6px 0 14px;color:var(--paper-head)}
-.paper .info2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin:0 0 10px}
-.paper .info{display:grid;grid-template-columns:90px minmax(0,1fr);gap:3px 8px;margin:0}
-.paper .info.r{grid-template-columns:76px minmax(0,1fr)}
-.paper .info dt{font-weight:700;color:var(--paper-head)}
-.paper .info dd{margin:0;overflow-wrap:anywhere}
-.paper .info dd.cust{font-weight:700;font-size:14px}
+.paper .plogo{width:150px;height:auto;flex:none}
+.paper .co{font-weight:700;font-size:19px;color:var(--paper-head)}
+.paper .co-sub{margin-top:2px}
+.paper .co-sub .ht{font-weight:700;font-size:14.5px;color:#1f5aa6;margin-top:1px}
+.paper .co-sub .hl{font-weight:700;font-size:11.5px;color:#1a1a1a}
+.paper .co-sub .hb{height:9px}
+.paper .rule{border-top:4.5px solid var(--paper-head);border-bottom:3px solid var(--paper-accent);margin:10px 0 14px}
+.paper h1{text-align:center;font-size:26px;letter-spacing:.04em;margin:6px 0 14px;color:var(--paper-head)}
+.paper table.itab{width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 10px;font-size:13.5px}
+.paper table.itab th,.paper table.itab td{border:1px solid #1a1a1a;padding:4px 6px;text-align:left;background:none;color:#1a1a1a;font-weight:400;vertical-align:middle;overflow-wrap:anywhere}
+.paper table.itab th{color:#1f5aa6;font-weight:700}
+.paper table.itab td.cust{font-weight:700;font-size:15.5px}
 .paper .intro{font-style:italic;margin:0 0 8px}
 .paper table{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
 .paper th{background:var(--paper-head);color:#fff;border:1px solid var(--paper-line);padding:6px 4px;font-weight:700}
@@ -288,12 +289,17 @@ details.box[open] summary{margin-bottom:10px}
           <legend>Khách hàng</legend>
           <label for="q-cust">Kính gửi (tên công ty)<input id="q-cust" placeholder="VD: Công ty Cổ phần Dược Hậu Giang"></label>
           <label for="q-addr">Địa chỉ<input id="q-addr"></label>
-          <div class="row">
-            <label for="q-attn">Người nhận<input id="q-attn"></label>
-            <label for="q-tel">Điện thoại<input id="q-tel"></label>
-          </div>
-          <label for="q-email">Email<input id="q-email"></label>
           <label for="q-date">Ngày báo giá<input id="q-date" type="date"></label>
+        </fieldset>
+        <div class="sep"></div>
+        <fieldset>
+          <legend>Người gửi</legend>
+          <label for="q-sname">Người gửi<input id="q-sname" placeholder="VD: Nguyễn Huỳnh Anh"></label>
+          <div class="row">
+            <label for="q-stel">Điện thoại<input id="q-stel" inputmode="tel" placeholder="VD: 089 642 3003"></label>
+            <label for="q-semail">Email<input id="q-semail" type="email" placeholder="VD: ten@saticus.com"></label>
+          </div>
+          <div class="btns"><button type="button" class="btn sm" id="q-ssave">Lưu làm thông tin mặc định của tôi</button><span class="status" id="q-sstatus"></span></div>
         </fieldset>
         <div class="sep"></div>
         <details class="box">
@@ -454,7 +460,7 @@ const DEFAULT_SETTINGS = {
   header: "", intro: "", signTitle: "", signName: "", vat: 8,
   terms: "Giá đã bao gồm chi phí vận chuyển nội địa, quốc tế và thuế nhập khẩu.\nThuế GTGT: {VAT}%.\nHàng mới 100% theo tiêu chuẩn nhà sản xuất.\nBảo hành 24 tháng kể từ ngày nghiệm thu.\nHỗ trợ bảo trì, bảo dưỡng sau thời gian bảo hành.\nThời gian giao hàng: 8–12 tuần kể từ ngày nhận tiền cọc.\nBáo giá có giá trị 60 ngày kể từ ngày báo giá."
 };
-const BRAND = "FF08509C", ACCENT = "FFF9A71F", TINT = "FFEAF1F9", INK = "FF1A1A1A", LINE = "FF8A97A8", FONT = "Times New Roman";
+const BRAND = "FF08509C", BRAND_2 = "FF1F5AA6", ACCENT = "FFF9A71F", TINT = "FFEAF1F9", INK = "FF1A1A1A", LINE = "FF8A97A8", FONT = "Times New Roman";
 
 function parseBody(text){
   const sections = []; let cur = null;
@@ -495,6 +501,11 @@ function words(n){
 }
 function moneyWords(n){ n = Math.round(n); if (n <= 0) return ""; const w = words(n); return w.charAt(0).toUpperCase() + w.slice(1) + " đồng."; }
 
+/* Dòng thông tin văn phòng: dòng ngắn không có ":" (VD "VietNam", "Indonesia") là tiêu đề nhóm */
+function headerLines(text){
+  return String(text || "").split(/\r?\n/).map(l => l.replace(/\s+$/, "")).map(t => ({text: t,
+    kind: !t.trim() ? "blank" : (t.trim().length <= 24 && !/[:@]/.test(t) && !/\d{3,}/.test(t)) ? "title" : "line"}));
+}
 /* items = [{p, qty, price, scope:[{code,text,qty}]}] */
 function calcAll(items, vatText){
   const vat = dec(vatText);
@@ -561,40 +572,47 @@ function buildWorkbook(ExcelJS, items, q, st, logo){
   };
   const merged = (text, opts={}) => { r++; mergedRow(`A${r}:F${r}`, text, opts); ws.getRow(r).height = opts.height || rowHeight(text, 118, (opts.font && opts.font.size) || 11); };
 
-  /* 1. Phần đầu: tên công ty + văn phòng bên trái (A:D), logo góc phải (E:F) */
-  r = 1; mergedRow("A1:D1", st.companyName || "", {font: {bold: true, size: 14, color: {argb: BRAND}}, align: {vertical: "bottom"}}); ws.getRow(1).height = 24;
-  const hdr = st.header || "";
-  r = 2; mergedRow("A2:D2", hdr, {font: {size: 9, color: {argb: "FF3A3A40"}}, align: {vertical: "top"}});
-  const logoPt = 78;
-  ws.getRow(2).height = Math.max(rowHeight(hdr, 108, 9) - 4, logoPt + 6 - 24);
+  /* 1. Phần đầu: tên công ty + văn phòng (A:D), logo lớn góc phải (E:F) */
+  r = 1; mergedRow("A1:D1", st.companyName || "", {font: {bold: true, size: 16, color: {argb: BRAND}}, align: {vertical: "bottom"}}); ws.getRow(1).height = 26;
+  const hl = headerLines(st.header || "");
+  r = 2; ws.mergeCells("A2:D2");
+  const hc = ws.getCell("A2");
+  hc.value = {richText: hl.map((l, i) => ({text: l.text + (i < hl.length - 1 ? "\n" : ""),
+    font: l.kind === "title" ? {name: FONT, size: 13, bold: true, color: {argb: BRAND_2}} : {name: FONT, size: 10, bold: true, color: {argb: INK}}}))};
+  hc.alignment = {vertical: "top", wrapText: true};
+  const per = Math.floor((W.A + W.B + W.C + W.D) * 1.12 * 11 / 10) - 4;
+  const hPt = hl.reduce((a, l) => a + (l.kind === "title" ? 17 : l.kind === "blank" ? 9 : 13.5 * Math.max(1, Math.ceil(l.text.length / per))), 0) + 6;
+  ws.getRow(2).height = Math.min(409, hPt);
   if (logo) {
-    const hPx = Math.round(logoPt * 4 / 3), wPx = Math.round(logo.w * hPx / logo.h);
     const colPx = ch => Math.floor(ch * 7 + 5), avail = colPx(W.E) + colPx(W.F);
-    const left = 4 + (avail - wPx) - 6;   // canh phải trong vùng E:F
+    let hPx = Math.min(Math.round((26 + hPt) * 4 / 3) - 16, 240), wPx = Math.round(logo.w * hPx / logo.h);
+    if (wPx > avail - 10) { wPx = avail - 10; hPx = Math.round(logo.h * wPx / logo.w); }
+    const left = avail - wPx - 6;
     const col = left < colPx(W.E) ? 4 + left / colPx(W.E) : 5 + (left - colPx(W.E)) / colPx(W.F);
     const id = wb.addImage({base64: logo.base64, extension: "png"});
-    ws.addImage(id, {tl: {col, row: 0.15}, ext: {width: wPx, height: hPx}, editAs: "oneCell"});
+    ws.addImage(id, {tl: {col, row: 0.25}, ext: {width: wPx, height: hPx}, editAs: "oneCell"});
   }
   /* vạch xanh + vạch cam như logo */
-  r = 3; ws.getRow(r).height = 4; for (let k = 1; k <= 6; k++) ws.getRow(r).getCell(k).fill = fill(BRAND);
-  r = 4; ws.getRow(r).height = 2.5; for (let k = 1; k <= 6; k++) ws.getRow(r).getCell(k).fill = fill(ACCENT);
+  r = 3; ws.getRow(r).height = 4.5; for (let k = 1; k <= 6; k++) ws.getRow(r).getCell(k).fill = fill(BRAND);
+  r = 4; ws.getRow(r).height = 3; for (let k = 1; k <= 6; k++) ws.getRow(r).getCell(k).fill = fill(ACCENT);
   r++; ws.getRow(r).height = 10;
 
   /* 2. Tiêu đề */
   merged("BẢNG BÁO GIÁ", {font: {bold: true, size: 18, color: {argb: BRAND}}, align: {horizontal: "center"}, height: 30});
   r++; ws.getRow(r).height = 6;
 
-  /* 3. Khối thông tin: khách hàng bên trái, ngày / liên hệ bên phải */
-  const left = [["Kính gửi:", q.customer, true], ["Địa chỉ:", q.address], ["Người nhận:", q.attn]];
-  const right = [["Ngày:", fmtDate(q.date)], ["Điện thoại:", q.tel], ["Email:", q.email]];
-  left.forEach((L, i) => {
-    r++; const row = ws.getRow(r), R = right[i];
-    ws.mergeCells(`A${r}:B${r}`); ws.mergeCells(`C${r}:D${r}`);
-    row.getCell(1).value = L[0]; row.getCell(1).font = f({bold: true, color: {argb: BRAND}}); row.getCell(1).alignment = {vertical: "top"};
-    row.getCell(3).value = L[1] || ""; row.getCell(3).font = f({bold: !!L[2], size: L[2] ? 12 : 11}); row.getCell(3).alignment = {wrapText: true, vertical: "top"};
-    row.getCell(5).value = R[0]; row.getCell(5).font = f({bold: true, color: {argb: BRAND}}); row.getCell(5).alignment = {horizontal: "right", vertical: "top"};
-    row.getCell(6).value = R[1] || ""; row.getCell(6).font = f(); row.getCell(6).alignment = {wrapText: true, vertical: "top"};
-    row.height = Math.max(rowHeight(L[1] || "", W.C + W.D, 11), rowHeight(R[1] || "", W.F + 2, 11), 18);
+  /* 3. Khối thông tin: bảng có viền — khách hàng bên trái, người gửi bên phải */
+  const black = {style: "thin", color: {argb: "FF1A1A1A"}}, bb = {top: black, bottom: black, left: black, right: black};
+  const info = [["Kính gửi:", q.customer, "Người gửi:", q.sname, true], ["Địa chỉ:", q.address, "Điện thoại:", q.stel], ["Ngày:", fmtDate(q.date), "Email:", q.semail]];
+  info.forEach(([l1, v1, l2, v2, big]) => {
+    r++; const row = ws.getRow(r);
+    ws.mergeCells(`A${r}:B${r}`); ws.mergeCells(`D${r}:E${r}`);
+    for (let k = 1; k <= 6; k++) { row.getCell(k).border = bb; row.getCell(k).alignment = {vertical: "middle", wrapText: true}; }
+    row.getCell(1).value = l1; row.getCell(1).font = f({bold: true, size: 12, color: {argb: BRAND_2}});
+    row.getCell(3).value = v1 || ""; row.getCell(3).font = f({bold: !!big, size: big ? 14 : 12});
+    row.getCell(4).value = l2; row.getCell(4).font = f({bold: true, size: 12, color: {argb: BRAND_2}});
+    row.getCell(6).value = v2 || ""; row.getCell(6).font = f({size: 12});
+    row.height = Math.max(rowHeight(v1 || "", W.C, big ? 14 : 12), rowHeight(v2 || "", W.F, 12), 21);
   });
   r++; ws.getRow(r).height = 8;
   merged(introText(st), {font: {italic: true}});
@@ -806,14 +824,15 @@ function currentItems(){
   });
 }
 function readQuote(){
-  return {vat: $("q-vat").value, customer: $("q-cust").value.trim(), address: $("q-addr").value.trim(), attn: $("q-attn").value.trim(),
-    tel: $("q-tel").value.trim(), email: $("q-email").value.trim(), date: $("q-date").value, terms: $("q-terms").value};
+  return {vat: $("q-vat").value, customer: $("q-cust").value.trim(), address: $("q-addr").value.trim(), date: $("q-date").value, terms: $("q-terms").value,
+    sname: $("q-sname").value.trim(), stel: $("q-stel").value.trim(), semail: $("q-semail").value.trim()};
 }
 function saveQuote(){ quote = readQuote(); LS.set("bg_quote", quote); LS.set("bg_lines", lines); }
 function openQuote(){
   $("q-vat").value = quote.vat ?? String(settings.vat);
-  $("q-cust").value = quote.customer || ""; $("q-addr").value = quote.address || ""; $("q-attn").value = quote.attn || "";
-  $("q-tel").value = quote.tel || ""; $("q-email").value = quote.email || ""; $("q-date").value = quote.date || today();
+  $("q-cust").value = quote.customer || ""; $("q-addr").value = quote.address || ""; $("q-date").value = quote.date || today();
+  const sd = senderDefault();
+  $("q-sname").value = quote.sname || sd.name || ""; $("q-stel").value = quote.stel || sd.tel || ""; $("q-semail").value = quote.semail || sd.email || "";
   $("q-terms").value = quote.terms ?? settings.terms;
   renderItems(); refreshQuote(); show("quote"); $("q-status").textContent = ""; fitPaper();
 }
@@ -848,9 +867,17 @@ function renderItems(){
     box.appendChild(d);
   });
 }
-["vat","cust","addr","attn","tel","email","date","terms"].forEach(k => $("q-" + k).addEventListener("input", refreshQuote));
+["vat","cust","addr","date","terms","sname","stel","semail"].forEach(k => $("q-" + k).addEventListener("input", refreshQuote));
+/* Thông tin người gửi mặc định: lưu riêng cho từng tài khoản trên máy này */
+let ME = {name: "", email: ""};
+const senderKey = () => "bg_sender_" + (session && session.user ? session.user.id : "x");
+function senderDefault(){ const v = LS.get(senderKey()) || {}; return {name: v.name || ME.name, tel: v.tel || "", email: v.email || ME.email}; }
+$("q-ssave").addEventListener("click", () => {
+  LS.set(senderKey(), {name: $("q-sname").value.trim(), tel: $("q-stel").value.trim(), email: $("q-semail").value.trim()});
+  $("q-sstatus").className = "status ok"; $("q-sstatus").textContent = "Đã lưu. Báo giá sau sẽ tự điền.";
+});
 $("q-resetTerms").addEventListener("click", () => { $("q-terms").value = settings.terms; refreshQuote(); });
-$("q-clear").addEventListener("click", () => { ["cust","addr","attn","tel","email"].forEach(k => $("q-" + k).value = ""); $("q-date").value = today(); refreshQuote(); });
+$("q-clear").addEventListener("click", () => { ["cust","addr"].forEach(k => $("q-" + k).value = ""); $("q-date").value = today(); refreshQuote(); });
 
 function refreshQuote(){
   const items = currentItems(), q = readQuote(), c = calcAll(items, q.vat);
@@ -875,23 +902,17 @@ function renderPaper(items, q, c){
   const mw = moneyWords(c.total);
   $("paper").innerHTML = `
     <div class="phead">
-      <div class="pco"><div class="co">${esc(st.companyName)}</div>${st.header ? `<div class="co-sub">${esc(st.header)}</div>` : ""}</div>
+      <div class="pco"><div class="co">${esc(st.companyName)}</div><div class="co-sub">${headerLines(st.header).map(l => l.kind === "blank" ? `<div class="hb"></div>` : `<div class="${l.kind === "title" ? "ht" : "hl"}">${esc(l.text)}</div>`).join("")}</div></div>
       <img class="plogo" src="logo.png" alt="Logo SatiCus">
     </div>
     <div class="rule"></div>
     <h1>BẢNG BÁO GIÁ</h1>
-    <div class="info2">
-      <dl class="info">
-        <dt>Kính gửi:</dt><dd class="cust">${ph(q.customer, "Tên khách hàng")}</dd>
-        <dt>Địa chỉ:</dt><dd>${esc(q.address)}</dd>
-        <dt>Người nhận:</dt><dd>${esc(q.attn)}</dd>
-      </dl>
-      <dl class="info r">
-        <dt>Ngày:</dt><dd>${esc(fmtDate(q.date))}</dd>
-        <dt>Điện thoại:</dt><dd>${esc(q.tel)}</dd>
-        <dt>Email:</dt><dd>${esc(q.email)}</dd>
-      </dl>
-    </div>
+    <table class="itab">
+      <colgroup><col style="width:16%"><col><col style="width:14%"><col style="width:26%"></colgroup>
+      <tr><th>Kính gửi:</th><td class="cust">${ph(q.customer, "Tên khách hàng")}</td><th>Người gửi:</th><td>${ph(q.sname, "Người gửi")}</td></tr>
+      <tr><th>Địa chỉ:</th><td>${esc(q.address)}</td><th>Điện thoại:</th><td>${esc(q.stel)}</td></tr>
+      <tr><th>Ngày:</th><td>${esc(fmtDate(q.date))}</td><th>Email:</th><td>${esc(q.semail)}</td></tr>
+    </table>
     <p class="intro">${esc(introText(st))}</p>
     <table>
       <colgroup><col style="width:5%"><col style="width:11%"><col><col style="width:6%"><col style="width:13%"><col style="width:15%"></colgroup>
@@ -1330,6 +1351,7 @@ async function enterApp(){
   if (role) { $("meRole").textContent = ROLES[role] || role; $("meRole").hidden = false; }
   const {data: prof} = await sb.from("profiles").select("full_name").eq("id", session.user.id).maybeSingle();
   $("meName").textContent = (prof && prof.full_name) || (session.user.email || "").split("@")[0];
+  ME = {name: (prof && prof.full_name) || "", email: /internal\.saticus\.local$/.test(session.user.email || "") ? "" : (session.user.email || "")};
   await Promise.all([loadSettings(), loadProducts()]);
   channel = sb.channel("bao-gia")
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_products"}, () => loadProducts())
