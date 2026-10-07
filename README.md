@@ -1,6 +1,12 @@
 # Báo giá SatiCus
 
-Ứng dụng web tạo báo giá Excel theo form SatiCus: thư viện máy dùng chung, điền khách hàng, giá, ngày, điều khoản và xuất file `.xlsx`.
+Ứng dụng web lưu, tạo và xuất báo giá Excel theo form SatiCus.
+
+1. **Thư viện báo giá** (màn hình đầu): model được nhóm theo **dòng máy** → **hãng**, có bộ lọc theo dòng máy, theo hãng và ô tìm kiếm.
+2. **Chọn model**: tick một hoặc nhiều model, thanh dưới cùng hiện số model đã chọn.
+3. **Xuất báo giá**: điền số lượng, đơn giá từng model, bỏ/đổi SL cấu hình tiêu chuẩn, thông tin khách, ngày, điều khoản → tải file Excel.
+
+Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 
 - Giao diện: `index.html` tĩnh, chạy trên GitHub Pages.
 - Dữ liệu và đăng nhập: dùng chung project Supabase với Alex workspace (cùng tên đăng nhập, mật khẩu, vai trò).
