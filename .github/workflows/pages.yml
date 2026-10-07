@@ -25,7 +25,7 @@ jobs:
       - name: Chuẩn bị thư mục site
         run: |
           mkdir _site
-          cp index.html config.js .nojekyll _site/
+          cp index.html config.js logo.png .nojekyll _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
