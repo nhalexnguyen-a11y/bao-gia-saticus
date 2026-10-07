@@ -26,3 +26,7 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `config.js` – địa chỉ Supabase và khóa công khai
 - `supabase/schema.sql` – tạo 2 bảng và chính sách RLS (đã chạy)
 - `supabase/seed.sql` – dữ liệu ban đầu: cài đặt công ty, máy LW230H (đã chạy)
+
+## Nhập model
+
+Trang **Thêm model** có: nhập từ file Excel báo giá cũ, nhân bản model, công cụ gộp dòng bị ngắt / tự nhận tiêu đề / dọn dòng trống, dán cấu hình tiêu chuẩn từ Excel, xem trước trực tiếp, cảnh báo trùng model và tự lưu bản nháp.
