@@ -135,10 +135,64 @@ details.box{border-radius:12px;background:var(--card);padding:10px 14px}
 details.box summary{cursor:pointer;font-size:13.5px;font-weight:600;list-style-position:inside}
 details.box[open] summary{margin-bottom:10px}
 
-/* Đăng nhập */
-.login{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
-.login form{width:100%;max-width:400px;gap:18px;padding:32px 28px}
-.login .brand{padding:0}
+/* Đăng nhập: trái là khối thương hiệu đảo màu, phải là form */
+.login{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--bg)}
+.lg-brand{position:relative;overflow:hidden;background:var(--ink);color:var(--bg);padding:40px 48px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;min-height:100vh;min-height:100dvh}
+.lg-logo{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.lg-logo b{display:block;font-size:18px;font-weight:800;letter-spacing:.14em;line-height:1.2}
+.lg-logo small{display:block;font-size:12.5px;opacity:.6}
+.gtile.inv{background:var(--bg);color:var(--ink)}
+.lg-hero{position:relative;z-index:1}
+.lg-hero h1{margin:0;font-size:clamp(40px,4.6vw,64px);font-weight:800;letter-spacing:-.02em;line-height:1.03;text-wrap:balance}
+.lg-hero h1 span{opacity:.45}
+.lg-hero p{margin:18px 0 0;max-width:440px;font-size:16px;opacity:.7}
+.lg-points{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;position:relative;z-index:1}
+.lg-points li{display:flex;flex-direction:column;gap:3px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--bg) 22%,transparent);font-size:13px}
+.lg-points span{opacity:.6}
+.lg-watermark{position:absolute;right:-40px;bottom:-130px;font-family:"Times New Roman",Georgia,serif;font-weight:700;font-size:520px;line-height:1;opacity:.06;pointer-events:none;user-select:none}
+.lg-main{display:flex;flex-direction:column;gap:12px;padding:24px 32px;min-width:0}
+.lg-top{display:flex;justify-content:flex-end}
+.lg-box{width:100%;max-width:380px;margin:auto;display:flex;flex-direction:column;gap:16px;padding:24px 0}
+.lg-box form{display:flex;flex-direction:column;gap:16px}
+.lg-head{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.lg-title{margin:0;font-size:clamp(28px,3vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.lg-sub{margin:0;color:var(--muted)}
+.login label input{background:var(--card);border:0;border-radius:12px;box-shadow:inset 0 0 0 1px var(--border);font-size:16px;padding:13px 14px;min-height:50px}
+.login label input:focus{background:var(--card);box-shadow:inset 0 0 0 2px var(--ink)}
+.login label input.bad{box-shadow:inset 0 0 0 2px var(--red)}
+.pw{position:relative;display:block}
+.pw input{padding-right:76px}
+.pw-toggle{all:unset;box-sizing:border-box;position:absolute;right:6px;top:50%;transform:translateY(-50%);min-height:38px;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.pw-toggle:hover{color:var(--text);background:var(--card-2)}
+.pw-toggle:focus-visible{outline:2px solid var(--ink);outline-offset:0}
+.caps{margin:-8px 0 0;font-size:13px;font-weight:600;color:var(--orange)}
+.lg-row{display:flex;justify-content:flex-end;margin-top:-6px}
+.lnk{all:unset;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;padding:6px 0}
+.lnk:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.lnk.back{align-self:flex-start;text-decoration:none;color:var(--muted)}
+.lnk.back:hover{color:var(--text)}
+.lg-submit{min-height:52px;font-size:15px}
+.spin{display:none;width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite}
+.lg-submit.busy .spin{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:500;line-height:1.45}
+.msg.error{background:var(--red-bg);color:var(--red)}
+.msg.ok{background:var(--green-bg);color:var(--green)}
+.msg svg{flex:none;width:18px;height:18px;margin-top:1px}
+.note-box{padding:12px 14px;border-radius:12px;background:var(--card);box-shadow:inset 0 0 0 1px var(--border);font-size:13.5px;color:var(--muted)}
+.lg-copy{margin:0;text-align:center;font-size:12px;color:var(--muted)}
+@media (max-width:880px){
+  .login{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
+  .lg-brand{min-height:0;padding:20px 16px 26px;gap:18px}
+  .lg-hero p,.lg-points{display:none}
+  .lg-hero h1{font-size:34px}
+  .lg-watermark{font-size:240px;right:-16px;bottom:-70px}
+  .lg-main{padding:20px 16px 20px}
+  .lg-box{margin:0 auto;padding:4px 0 16px}
+  .login{position:relative}
+  .lg-top{position:absolute;top:14px;right:14px;z-index:2}
+  .lg-top .btn{border-color:color-mix(in srgb,var(--bg) 35%,transparent);color:var(--bg);background:transparent}
+}
 .sheet .inner .btn .ico{margin-right:6px}
 
 /* Thư viện máy */
@@ -369,15 +423,42 @@ details.box[open] summary{margin-bottom:10px}
 <body>
 
 <section class="login" id="loginView" hidden>
-  <form class="panel" id="loginForm" autocomplete="on">
-    <div class="brand"><span class="gtile" aria-hidden="true">G</span><div><b>GORDIAN</b><small>Thư viện báo giá</small></div></div>
-    <h1 class="h-sec">Đăng nhập</h1>
-    <p class="hint">Dùng cùng tên đăng nhập và mật khẩu với GOR. Quên mật khẩu thì khôi phục trong GOR.</p>
-    <label for="lg-user">Tên đăng nhập<input id="lg-user" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
-    <label for="lg-pass">Mật khẩu<input id="lg-pass" type="password" autocomplete="current-password" required></label>
-    <button class="btn primary block" type="submit" id="lg-btn">Đăng nhập</button>
-    <p class="status" id="lg-status" role="status"></p>
-  </form>
+  <aside class="lg-brand" aria-label="Giới thiệu">
+    <div class="lg-logo"><span class="gtile inv" aria-hidden="true">G</span><div><b>GORDIAN</b><small>Thư viện báo giá · by Alex Nguyen</small></div></div>
+    <div class="lg-hero">
+      <h1>Nạp một lần.<br><span>Dùng cho mọi báo giá.</span></h1>
+      <p>Thư viện máy dùng chung cho đội sales. Chọn máy, điền khách và giá, xuất báo giá Excel theo form SatiCus.</p>
+    </div>
+    <ul class="lg-points">
+      <li><b>Thư viện máy</b><span>Nhập thông số một lần, cả đội cùng dùng</span></li>
+      <li><b>Xuất Excel</b><span>Đúng form báo giá SatiCus</span></li>
+      <li><b>Tài khoản GOR</b><span>Dùng chung đăng nhập và phân quyền</span></li>
+    </ul>
+    <span class="lg-watermark" aria-hidden="true">G</span>
+  </aside>
+  <div class="lg-main">
+    <div class="lg-top"><button class="btn sm icon theme-btn" type="button" title="Dark / Light" aria-label="Đổi giao diện sáng hoặc tối">☾</button></div>
+    <div class="lg-box" id="loginBox">
+      <form id="loginForm" autocomplete="on" novalidate>
+        <div class="lg-head"><p class="eyebrow">Đăng nhập</p><h2 class="lg-title">Chào bạn trở lại.</h2><p class="lg-sub">Dùng tên đăng nhập và mật khẩu của GOR.</p></div>
+        <div class="msg" id="lg-status" role="alert" hidden></div>
+        <label for="lg-user">Tên đăng nhập<input id="lg-user" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required></label>
+        <label for="lg-pass">Mật khẩu<span class="pw"><input id="lg-pass" name="password" type="password" autocomplete="current-password" required><button type="button" class="pw-toggle" id="lg-eye" aria-controls="lg-pass" aria-pressed="false">Hiện</button></span></label>
+        <p class="caps" id="lg-caps" hidden>Caps Lock đang bật</p>
+        <div class="lg-row"><button type="button" class="lnk" id="lg-forgot">Quên mật khẩu?</button></div>
+        <button class="btn primary block lg-submit" type="submit" id="lg-btn"><span class="spin" aria-hidden="true"></span><span class="lbl">Đăng nhập</span></button>
+      </form>
+    </div>
+    <div class="lg-box" id="recoverBox" hidden>
+      <button type="button" class="lnk back" id="lg-back">← Quay lại đăng nhập</button>
+      <div class="lg-head"><p class="eyebrow">Khôi phục mật khẩu</p><h2 class="lg-title">Đặt lại trong GOR.</h2>
+        <p class="lg-sub">Ứng dụng báo giá dùng chung tài khoản với GOR. Mật khẩu được khôi phục bằng recovery key trên trang đăng nhập của GOR; mật khẩu mới dùng được ở đây ngay sau đó.</p></div>
+      <p class="hint" id="rc-userRow" hidden>Tên đăng nhập của bạn: <b id="rc-user"></b></p>
+      <a class="btn primary block lg-submit" href="https://alex-workspace.pages.dev/" target="_blank" rel="noopener">Mở trang khôi phục của GOR →</a>
+      <div class="note-box">Không có recovery key? Liên hệ Admin để được cấp lại mật khẩu.</div>
+    </div>
+    <p class="lg-copy">© 2026 Nguyễn Huỳnh Anh (Alex Nguyen). Thuộc bộ công cụ GOR.</p>
+  </div>
 </section>
 
 <div id="appView" class="shell" hidden>
@@ -2316,11 +2397,42 @@ async function enterApp(){
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_taxonomy"}, () => loadTaxo())
     .subscribe();
 }
-function showLogin(msg){ $("appView").hidden = true; $("loginView").hidden = false; if (msg != null) $("lg-status").textContent = msg; }
+/* Thông báo trên trang đăng nhập: khung có icon; trường lỗi viền đỏ và nhận focus */
+const MSG_ICON = {
+  error: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>`,
+  ok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></svg>`};
+function showMsg(kind, text, field){
+  const b = $("lg-status");
+  ["lg-user","lg-pass"].forEach(id => $(id).classList.remove("bad"));
+  if (!text) { b.hidden = true; b.innerHTML = ""; return; }
+  b.className = "msg " + kind; b.innerHTML = MSG_ICON[kind] + `<span>${esc(text)}</span>`; b.hidden = false;
+  if (field) { $(field).classList.add("bad"); $(field).focus(); }
+}
+function setBusy(on){
+  const btn = $("lg-btn"); btn.disabled = on; btn.classList.toggle("busy", on);
+  btn.querySelector(".lbl").textContent = on ? "Đang đăng nhập" : "Đăng nhập";
+}
+function showLogin(msg){ $("appView").hidden = true; $("loginView").hidden = false; $("recoverBox").hidden = true; $("loginBox").hidden = false; if (msg != null) showMsg("error", msg); }
+["lg-user","lg-pass"].forEach(id => $(id).addEventListener("input", () => $(id).classList.remove("bad")));
+$("lg-eye").addEventListener("click", () => {
+  const show = $("lg-pass").type === "password"; $("lg-pass").type = show ? "text" : "password";
+  $("lg-eye").textContent = show ? "Ẩn" : "Hiện"; $("lg-eye").setAttribute("aria-pressed", String(show));
+});
+["keydown","keyup"].forEach(ev => $("lg-pass").addEventListener(ev, e => { if (e.getModifierState) $("lg-caps").hidden = !e.getModifierState("CapsLock"); }));
+$("lg-pass").addEventListener("blur", () => { $("lg-caps").hidden = true; });
+$("lg-forgot").addEventListener("click", () => {
+  const u = $("lg-user").value.trim(); $("rc-user").textContent = u; $("rc-userRow").hidden = !u;
+  $("loginBox").hidden = true; $("recoverBox").hidden = false; $("lg-back").focus();
+});
+$("lg-back").addEventListener("click", () => { $("recoverBox").hidden = true; $("loginBox").hidden = false; $("lg-user").focus(); });
 $("loginForm").addEventListener("submit", async e => {
-  e.preventDefault(); const st = $("lg-status"); st.className = "status"; st.textContent = "Đang đăng nhập…"; $("lg-btn").disabled = true;
+  e.preventDefault();
+  const id = $("lg-user").value.trim();
+  if (!id) { showMsg("error", "Nhập tên đăng nhập.", "lg-user"); return; }
+  if (!$("lg-pass").value) { showMsg("error", "Nhập mật khẩu.", "lg-pass"); return; }
+  showMsg(); setBusy(true);
   try {
-    const id = $("lg-user").value.trim(); let email = id;
+    let email = id;
     if (!id.includes("@")) {
       const {data, error} = await sb.rpc("get_auth_email_for_username", {p_username: id});
       if (error || !data) throw new Error("Sai tên đăng nhập hoặc mật khẩu.");
@@ -2328,16 +2440,16 @@ $("loginForm").addEventListener("submit", async e => {
     }
     const {error} = await sb.auth.signInWithPassword({email, password: $("lg-pass").value});
     if (error) throw new Error(/invalid/i.test(error.message) ? "Sai tên đăng nhập hoặc mật khẩu." : error.message);
-    st.textContent = ""; $("lg-pass").value = "";
-  } catch (err) { st.className = "status err"; st.textContent = err.message; }
-  finally { $("lg-btn").disabled = false; }
+    showMsg(); $("lg-pass").value = "";
+  } catch (err) { showMsg("error", err.message, "lg-pass"); }
+  finally { setBusy(false); }
 });
 $("logout").addEventListener("click", async () => { await sb.auth.signOut(); });
 
 (function boot(){
   const cfg = window.APP_CONFIG || {};
   if (!window.supabase || !cfg.SUPABASE_URL || /YOUR_/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY)) {
-    showLogin(); $("lg-status").className = "status err"; $("lg-status").textContent = "Chưa cấu hình Supabase trong config.js."; return;
+    showLogin("Chưa cấu hình Supabase trong config.js."); return;
   }
   sb = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
   sb.auth.onAuthStateChange((event, sess) => {
