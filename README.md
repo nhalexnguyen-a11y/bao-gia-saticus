@@ -26,7 +26,21 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `config.js` – địa chỉ Supabase và khóa công khai
 - `supabase/schema.sql` – tạo 2 bảng và chính sách RLS (đã chạy)
 - `supabase/seed.sql` – dữ liệu ban đầu: cài đặt công ty, máy LW230H (đã chạy)
+- `supabase/002_nhap_lieu.sql` – trạng thái duyệt, đoạn mẫu dùng chung, hộp thư nhập liệu
+- `CLAUDE.md` – quy trình Claude xử lý hộp thư
 
 ## Nhập model
 
 Trang **Thêm model** có: nhập từ file Excel báo giá cũ, nhân bản model, công cụ gộp dòng bị ngắt / tự nhận tiêu đề / dọn dòng trống, dán cấu hình tiêu chuẩn từ Excel, xem trước trực tiếp, cảnh báo trùng model và tự lưu bản nháp.
+
+Thêm từ bản nâng cấp nhập liệu:
+
+- **Kiểm tra trước khi lưu**: cảnh báo tiêu đề mục trống, dòng còn tiếng Anh, mục cấu hình thiếu mô tả hoặc SL; gợi ý thiếu xuất xứ, dòng lặp, dòng quá dài. Còn cảnh báo thì phải bấm Lưu lần hai.
+- **Chuẩn hóa ký hiệu**: `m3` → `m³`, `+/-` → `±`, `oC` → `°C`, `546x573` → `546 × 573`, `220 v` → `220V`, `5kw` → `5 kW`, `uS/cm` → `μS/cm`, `100 ml` → `100 mL`. Có Hoàn tác.
+- **Khung mục theo dòng máy**: lấy các tiêu đề mục mà model cùng dòng máy đang dùng.
+- **Đoạn mẫu / Mục mẫu**: lưu và chèn đoạn mô tả hoặc bộ mục cấu hình dùng chung; gợi ý mục giống nhau ở từ 2 model.
+- **Xem nội dung bản nháp** trước khi khôi phục.
+
+## Hộp thư nhập liệu
+
+Gửi catalog PDF (ứng dụng chỉ trích phần chữ trên trình duyệt, không tải file lên) hoặc dán nội dung. Nhắn Claude "xử lý hộp thư báo giá"; Claude tạo model **Chờ duyệt**. Model chờ duyệt không chọn được để báo giá cho tới khi có người mở ra và bấm **Duyệt và lưu**.
