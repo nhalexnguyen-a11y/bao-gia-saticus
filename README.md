@@ -30,6 +30,7 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `supabase/003_danh_muc.sql` – danh mục dòng máy và hãng
 - `supabase/004_hop_thu_super_admin.sql` – khóa hộp thư cho Super Admin (hộp thư đã gỡ khỏi ứng dụng)
 - `supabase/005_duyet_super_admin.sql` – chỉ Super Admin duyệt model
+- `supabase/006_xoa_hop_thu.sql` – xóa bảng hộp thư
 - `CLAUDE.md` – ghi chú cho Claude
 
 ## Nhập model
@@ -48,7 +49,7 @@ Thêm từ bản nâng cấp nhập liệu:
 
 Model do Claude tạo từ catalog (gửi file trong chat) ở trạng thái **Chờ duyệt**: không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu**. Tài khoản khác vẫn sửa được nhưng không duyệt được (cơ sở dữ liệu cũng chặn).
 
-(Tính năng Hộp thư nhập liệu đã gỡ khỏi ứng dụng; bảng `quote_inbox` vẫn còn trên cơ sở dữ liệu.)
+(Tính năng Hộp thư nhập liệu đã gỡ khỏi ứng dụng và bảng `quote_inbox` đã xóa.)
 
 ## Dòng máy & hãng
 
