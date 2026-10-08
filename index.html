@@ -910,8 +910,8 @@ function renderLib(){
         row.className = "mrow" + (on ? " on" : "") + (dr ? " draft" : "");
         row.innerHTML = `<input type="checkbox" id="sel-${esc(p.id)}" ${on ? "checked" : ""} ${dr ? "disabled" : ""} aria-label="Chọn ${esc(p.model || p.name)}">
           <div style="min-width:0"><div class="m">${esc(p.model || "(chưa có model)")}${dr ? ` <span class="chip draft">Chờ duyệt</span>` : ""}</div>
-          <div class="meta">${esc([dr && "Mở để kiểm tra và duyệt trước khi báo giá", p.origin && "Xuất xứ: " + p.origin, p.code && "Mã: " + p.code, (p.sections||[]).length + " mục mô tả", (p.scope||[]).length + " mục cấu hình"].filter(Boolean).join(" · "))}</div></div>
-          <button class="btn sm" type="button">${dr ? "Duyệt" : "Sửa"}</button>`;
+          <div class="meta">${esc([dr && (isSuper ? "Mở để kiểm tra và duyệt trước khi báo giá" : "Chờ Super Admin duyệt"), p.origin && "Xuất xứ: " + p.origin, p.code && "Mã: " + p.code, (p.sections||[]).length + " mục mô tả", (p.scope||[]).length + " mục cấu hình"].filter(Boolean).join(" · "))}</div></div>
+          <button class="btn sm" type="button">${dr && isSuper ? "Duyệt" : "Sửa"}</button>`;
         const cb = row.querySelector("input");
         const toggle = () => { if (dr) openEditor(p.id); else toggleSel(p.id); };
         row.addEventListener("click", e => { if (e.target.closest("button") || e.target === cb) return; toggle(); });
@@ -1177,10 +1177,12 @@ $("p-draftDrop").addEventListener("click", () => { clearDraft(); $("p-draft").hi
 
 function setReviewUI(p){
   const dr = isDraft(p);
-  $("p-review").hidden = !dr; $("p-approve").hidden = !dr;
-  $("p-save").className = dr ? "btn" : "btn primary";
+  /* Chỉ Super Admin được duyệt (cơ sở dữ liệu cũng chặn) */
+  $("p-review").hidden = !dr; $("p-approve").hidden = !(dr && isSuper);
+  $("p-save").className = dr && isSuper ? "btn" : "btn primary";
   $("p-save").textContent = dr ? "Lưu, chưa duyệt" : "Lưu model";
-  if (dr) $("p-reviewTxt").textContent = "Model này chưa được đưa vào báo giá." + (p.source ? " Nguồn: " + p.source + "." : "") + " Đọc lại, sửa nếu cần, rồi bấm Duyệt và lưu.";
+  if (dr) $("p-reviewTxt").textContent = "Model này chưa được đưa vào báo giá." + (p.source ? " Nguồn: " + p.source + "." : "")
+    + (isSuper ? " Đọc lại, sửa nếu cần, rồi bấm Duyệt và lưu." : " Chỉ Super Admin duyệt được model này.");
 }
 function afterEdit(dirty = true){
   if (dirty) { edDirty = true; dupAck = false; warnAck = false; saveDraft(); }
@@ -1449,7 +1451,7 @@ async function saveEditor(next, approve){
   s.textContent = "Đang lưu…";
   try {
     if (editingId) d.id = editingId;
-    if (approve) d.status = "approved";
+    if (approve) { if (!isSuper) { s.className = "status err"; s.textContent = "Chỉ Super Admin duyệt được model."; return; } d.status = "approved"; }
     const {data: saved, error} = await sb.from("quote_products").upsert(d).select().single();
     if (error) throw error;
     delete lines[saved.id]; clearDraft(); edDirty = false; $("p-draft").hidden = true;

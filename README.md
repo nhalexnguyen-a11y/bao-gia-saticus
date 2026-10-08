@@ -29,6 +29,7 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `supabase/002_nhap_lieu.sql` – trạng thái duyệt, đoạn mẫu dùng chung, hộp thư nhập liệu
 - `supabase/003_danh_muc.sql` – danh mục dòng máy và hãng
 - `supabase/004_hop_thu_super_admin.sql` – khóa hộp thư cho Super Admin
+- `supabase/005_duyet_super_admin.sql` – chỉ Super Admin duyệt model
 - `CLAUDE.md` – quy trình Claude xử lý hộp thư
 
 ## Nhập model
@@ -45,7 +46,7 @@ Thêm từ bản nâng cấp nhập liệu:
 
 ## Hộp thư nhập liệu
 
-Chỉ tài khoản **Super Admin** thấy và dùng được (giao diện ẩn mục này với tài khoản khác, cơ sở dữ liệu cũng chặn). Gửi catalog PDF (ứng dụng chỉ trích phần chữ trên trình duyệt, không tải file lên) hoặc dán nội dung. Nhắn Claude "xử lý hộp thư báo giá"; Claude tạo model **Chờ duyệt**. Model chờ duyệt không chọn được để báo giá cho tới khi có người mở ra và bấm **Duyệt và lưu**.
+Chỉ tài khoản **Super Admin** thấy và dùng được (giao diện ẩn mục này với tài khoản khác, cơ sở dữ liệu cũng chặn). Gửi catalog PDF (ứng dụng chỉ trích phần chữ trên trình duyệt, không tải file lên) hoặc dán nội dung. Nhắn Claude "xử lý hộp thư báo giá"; Claude tạo model **Chờ duyệt**. Model chờ duyệt không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu** (tài khoản khác vẫn sửa được nhưng không duyệt được).
 
 ## Dòng máy & hãng
 
