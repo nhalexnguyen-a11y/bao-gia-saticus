@@ -289,7 +289,7 @@ details.box[open] summary{margin-bottom:10px}
     <button type="button" id="nav-lib" aria-current="page">Thư viện báo giá</button>
     <button type="button" id="nav-new">Thêm model</button>
     <button type="button" id="nav-taxo">Dòng máy &amp; hãng</button>
-    <button type="button" id="nav-inbox">Hộp thư nhập liệu<span class="nbadge" id="inboxN" hidden></span></button>
+    <button type="button" id="nav-inbox" hidden>Hộp thư nhập liệu<span class="nbadge" id="inboxN" hidden></span></button>
     <button type="button" id="nav-set">Cài đặt</button>
     <a id="nav-gor" href="https://alex-workspace.pages.dev/app">← Về GOR</a>
   </nav>
@@ -827,7 +827,7 @@ const brandOf = p => (p.maker || "").trim() || NO;
 const vsort = (a, b) => a.localeCompare(b, "vi", {sensitivity: "base"});
 function today(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10); }
 
-let sb = null, session = null, canAdmin = false;
+let sb = null, session = null, canAdmin = false, isSuper = false;
 let products = new Map(), settings = {...DEFAULT_SETTINGS};
 let fCat = LS.get("bg_fcat") || "", fBrand = LS.get("bg_fbrand") || "";
 let selected = LS.get("bg_sel") || [];                // id model đã chọn, theo thứ tự chọn
@@ -848,7 +848,7 @@ function show(v){
 }
 $("nav-lib").addEventListener("click", () => guard(() => show("lib")));
 $("nav-set").addEventListener("click", () => guard(() => show("set")));
-$("nav-inbox").addEventListener("click", () => guard(() => { renderInbox(); show("inbox"); }));
+$("nav-inbox").addEventListener("click", () => { if (isSuper) guard(() => { renderInbox(); show("inbox"); }); });
 $("nav-taxo").addEventListener("click", () => guard(() => { renderTaxo(); show("taxo"); }));
 document.querySelectorAll(".taxo-link").forEach(a => a.addEventListener("click", e => { e.preventDefault(); guard(() => { renderTaxo(); show("taxo"); }); }));
 $("nav-new").addEventListener("click", () => guard(() => openEditor(null)));
@@ -1978,7 +1978,10 @@ $("ibForm").addEventListener("submit", async e => {
   } catch (err) { st.className = "status err"; st.textContent = err.message || "Không gửi được."; }
   finally { $("ib-send").disabled = false; }
 });
+/* Hộp thư chỉ dành cho Super Admin (cơ sở dữ liệu cũng chặn các tài khoản khác) */
 async function loadInbox(){
+  $("nav-inbox").hidden = !isSuper;
+  if (!isSuper) { inbox = []; $("inboxN").hidden = true; if (view === "inbox") show("lib"); return; }
   const {data, error} = await sb.from("quote_inbox")
     .select("id,file_name,note,hint_name,hint_maker,pages,status,result,product_ids,created_by,created_by_name,created_at,updated_at")
     .order("created_at", {ascending: false}).limit(100);
@@ -2010,7 +2013,7 @@ function renderInbox(){
       const p = products.get(id); if (!p) return;
       btns.appendChild(mkBtn((p.model || p.name) + (isDraft(p) ? " · chờ duyệt" : " · đã duyệt"), () => openEditor(id)));
     });
-    if (x.created_by === myId || canAdmin) {
+    if (x.created_by === myId || isSuper) {
       const b = mkBtn("Xóa yêu cầu", async () => {
         if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Bấm lần nữa để xóa"; b.classList.add("danger"); return; }
         const {error} = await sb.from("quote_inbox").delete().eq("id", x.id);
@@ -2082,7 +2085,7 @@ async function enterApp(){
   show("lib"); renderLib();
   const d = new Date(); $("todayPill").textContent = "Hôm nay: " + String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
   const {data: role} = await sb.rpc("get_my_role");
-  canAdmin = role === "admin" || role === "super_admin"; fillSettings();
+  canAdmin = role === "admin" || role === "super_admin"; isSuper = role === "super_admin"; fillSettings();
   const ROLES = {super_admin: "Super Admin", admin: "Admin", manager: "Manager", user: "User", cto_coo: "CTO/COO"};
   if (role) { $("meRole").textContent = ROLES[role] || role; $("meRole").hidden = false; }
   const {data: prof} = await sb.from("profiles").select("full_name").eq("id", session.user.id).maybeSingle();
@@ -2124,7 +2127,7 @@ $("logout").addEventListener("click", async () => { await sb.auth.signOut(); });
   sb.auth.onAuthStateChange((event, sess) => {
     session = sess;
     if (sess) setTimeout(enterApp, 0);
-    else { entered = false; if (channel) { sb.removeChannel(channel); channel = null; } products = new Map(); showLogin(""); }
+    else { entered = false; isSuper = false; canAdmin = false; $("nav-inbox").hidden = true; if (channel) { sb.removeChannel(channel); channel = null; } products = new Map(); showLogin(""); }
   });
 })();
 </script>
