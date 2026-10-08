@@ -214,8 +214,7 @@ details.box[open] summary{margin-bottom:10px}
 .savebar{position:sticky;bottom:12px;z-index:3;box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
-/* Trạng thái, kiểm tra, đoạn mẫu, hộp thư */
-.nbadge{display:inline-block;min-width:18px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:18px}
+/* Trạng thái, kiểm tra, đoạn mẫu */
 .chip{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;background:var(--bg);color:var(--muted2);white-space:nowrap;vertical-align:1px}
 .chip.draft{background:#fdf1dc;color:#7a5000}
 .chip.new{background:#e6edfb;color:#1f4fa8}
@@ -243,16 +242,6 @@ details.box[open] summary{margin-bottom:10px}
 .snip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px}
 .snip .tx{min-width:0;font-size:12.5px}
 .snip .tx small{display:block;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.inbox-grid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:1100px){.inbox-grid{grid-template-columns:minmax(0,1fr)}}
-.ibx{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
-.ibx .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.ibx .fn{font-weight:700;font-size:13.5px;overflow-wrap:anywhere}
-.ibx .meta{font-size:12px;color:var(--muted)}
-.ibx .nt{font-size:12.5px;white-space:pre-line;background:var(--soft);border-radius:10px;padding:6px 10px;overflow-wrap:anywhere}
-.ibx .res{font-size:12.5px;white-space:pre-line;overflow-wrap:anywhere}
-.drop{border:1.5px dashed var(--line2);border-radius:14px;padding:16px;text-align:center;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:8px;align-items:center}
-.drop.on{border-color:var(--ink);background:var(--soft)}
 .taxo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
 @media (max-width:1000px){.taxo-grid{grid-template-columns:minmax(0,1fr)}}
 .txadd{display:flex;gap:8px}
@@ -262,7 +251,6 @@ details.box[open] summary{margin-bottom:10px}
 .txrow .nm{font-weight:600;font-size:13.5px;overflow-wrap:anywhere}
 .txrow .nm small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
 .txrow .edit{display:flex;gap:6px;align-items:center}
-.flist-files{font-size:12.5px;color:var(--fg);text-align:left;width:100%;display:flex;flex-direction:column;gap:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -289,7 +277,6 @@ details.box[open] summary{margin-bottom:10px}
     <button type="button" id="nav-lib" aria-current="page">Thư viện báo giá</button>
     <button type="button" id="nav-new">Thêm model</button>
     <button type="button" id="nav-taxo">Dòng máy &amp; hãng</button>
-    <button type="button" id="nav-inbox" hidden>Hộp thư nhập liệu<span class="nbadge" id="inboxN" hidden></span></button>
     <button type="button" id="nav-set">Cài đặt</button>
     <a id="nav-gor" href="https://alex-workspace.pages.dev/app">← Về GOR</a>
   </nav>
@@ -508,38 +495,6 @@ details.box[open] summary{margin-bottom:10px}
         <form class="txadd" id="tx-brand-form" autocomplete="off"><input id="tx-brand-new" placeholder="VD: Eurping" aria-label="Tên hãng mới"><button class="btn primary" type="submit">Thêm</button></form>
         <p class="status" id="tx-brand-st" role="status"></p>
         <div class="txlist" id="tx-brand-list"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HỘP THƯ NHẬP LIỆU -->
-  <section id="view-inbox" hidden>
-    <div class="pagehead"><div><h1>Hộp thư nhập liệu</h1><p>Gửi catalog cho Claude dịch và tạo model. Model tạo ra ở trạng thái Chờ duyệt, cần người kiểm tra trước khi đưa vào báo giá.</p></div></div>
-    <div class="inbox-grid">
-      <form class="panel" id="ibForm" autocomplete="off">
-        <h2>Gửi catalog</h2>
-        <div class="drop" id="ib-drop">
-          <span>Kéo thả file PDF vào đây, hoặc</span>
-          <label class="btn" for="ib-file" style="flex-direction:row">Chọn file PDF…</label>
-          <input id="ib-file" type="file" accept="application/pdf,.pdf" multiple class="sr">
-          <div class="flist-files" id="ib-files"></div>
-        </div>
-        <p class="hint">Ứng dụng chỉ lấy phần chữ trong PDF ngay trên máy bạn rồi gửi phần chữ đó; file PDF không được tải lên. PDF dạng ảnh scan không lấy được chữ, khi đó hãy gửi file trực tiếp cho Claude trong chat.</p>
-        <label for="ib-text">Hoặc dán nội dung (từ Word, email, trang web…)<textarea id="ib-text" rows="5"></textarea></label>
-        <div class="row">
-          <label for="ib-name">Dòng máy *<select id="ib-name"></select></label>
-          <label for="ib-maker">Hãng *<select id="ib-maker"></select></label>
-        </div>
-        <p class="hint" style="margin-top:-6px">Chọn từ danh mục. Chưa có thì tạo ở trang <a href="#" class="taxo-link">Dòng máy &amp; hãng</a>.</p>
-        <label for="ib-note">Yêu cầu cho Claude<textarea id="ib-note" rows="3" placeholder="VD: Chỉ lấy model A220, xuất xứ Đức, bỏ phần phụ kiện tùy chọn."></textarea></label>
-        <div class="btns"><button class="btn primary" type="submit" id="ib-send">Gửi vào hộp thư</button></div>
-        <p class="status" id="ib-status" role="status"></p>
-        <div class="sep"></div>
-        <p class="hint">Sau khi gửi, nhắn Claude: <b>"xử lý hộp thư báo giá"</b>. Claude đọc các yêu cầu mới, tạo model Chờ duyệt và ghi kết quả vào từng yêu cầu. Phần chữ đã gửi sẽ được xóa sau khi xử lý xong.</p>
-      </form>
-      <div class="panel">
-        <div class="h2row"><h2>Yêu cầu đã gửi</h2><span class="count" id="ib-count"></span></div>
-        <div id="ib-list" style="display:flex;flex-direction:column;gap:10px"></div>
       </div>
     </div>
   </section>
@@ -835,20 +790,19 @@ let lines = LS.get("bg_lines") || {};                // id -> {qty, price, scope
 let quote = LS.get("bg_quote") || {};                 // thông tin khách, ngày, VAT, điều khoản
 let editingId = null, edScope = [], view = "lib";
 let taxo = {category: [], brand: []}, taxoOk = true;
-let snippets = [], snippetsOk = true, inbox = [], inboxOk = true, onlyDraft = false;
+let snippets = [], snippetsOk = true, onlyDraft = false;
 const isDraft = p => !!p && p.status === "draft";
 
 /* ---------- Điều hướng ---------- */
 function show(v){
   view = v;
-  ["lib","quote","edit","taxo","inbox","set"].forEach(x => $("view-" + x).hidden = x !== v);
-  const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", taxo: "nav-taxo", inbox: "nav-inbox", set: "nav-set"}[v];
-  ["nav-lib","nav-new","nav-taxo","nav-inbox","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
+  ["lib","quote","edit","taxo","set"].forEach(x => $("view-" + x).hidden = x !== v);
+  const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", taxo: "nav-taxo", set: "nav-set"}[v];
+  ["nav-lib","nav-new","nav-taxo","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
 }
 $("nav-lib").addEventListener("click", () => guard(() => show("lib")));
 $("nav-set").addEventListener("click", () => guard(() => show("set")));
-$("nav-inbox").addEventListener("click", () => { if (isSuper) guard(() => { renderInbox(); show("inbox"); }); });
 $("nav-taxo").addEventListener("click", () => guard(() => { renderTaxo(); show("taxo"); }));
 document.querySelectorAll(".taxo-link").forEach(a => a.addEventListener("click", e => { e.preventDefault(); guard(() => { renderTaxo(); show("taxo"); }); }));
 $("nav-new").addEventListener("click", () => guard(() => openEditor(null)));
@@ -1796,7 +1750,7 @@ $("p-sSnipOpen").addEventListener("click", () => toggleBox($("p-sSnipOpen"), $("
 
 /* ---------- Dòng máy & hãng (danh mục tạo riêng) ---------- */
 const TX = {category: {field: "name", label: "dòng máy"}, brand: {field: "maker", label: "hãng"}};
-const SEL = {"p-name": "category", "p-maker": "brand", "ib-name": "category", "ib-maker": "brand"};
+const SEL = {"p-name": "category", "p-maker": "brand"};
 /* Khi chưa có bảng danh mục thì lấy tạm từ các model đang có, để ứng dụng vẫn chạy */
 function taxoNames(kind){
   if (taxoOk) return taxo[kind].map(x => x.name);
@@ -1895,139 +1849,6 @@ async function removeTaxo(kind, name){
 }
 ["category", "brand"].forEach(kind => $("tx-" + kind + "-form").addEventListener("submit", e => { e.preventDefault(); addTaxo(kind); }));
 
-/* ---------- Hộp thư nhập liệu ---------- */
-const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/";
-const INBOX_MAX = 400000;
-let pdfjsP = null, ibFiles = [];
-function loadPdfJs(){
-  if (!pdfjsP) pdfjsP = import(PDFJS + "pdf.min.mjs").then(m => { m.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.mjs"; return m; })
-    .catch(e => { pdfjsP = null; throw new Error("Không tải được bộ đọc PDF. Kiểm tra mạng rồi thử lại."); });
-  return pdfjsP;
-}
-/* Ghép các mảnh chữ của một trang thành dòng theo vị trí */
-function pageText(items){
-  const out = []; let line = "", lastY = null, lastEnd = null;
-  for (const it of items) {
-    if (typeof it.str !== "string") continue;
-    const x = it.transform[4], y = it.transform[5];
-    if (lastY !== null && Math.abs(y - lastY) > 2 && line) { out.push(line); line = ""; lastEnd = null; }
-    if (it.str) {
-      if (line && lastEnd !== null && x - lastEnd > 1 && !/\s$/.test(line) && !/^\s/.test(it.str)) line += " ";
-      line += it.str; lastEnd = x + (it.width || 0);
-    }
-    lastY = y;
-    if (it.hasEOL) { if (line) out.push(line); line = ""; lastY = null; lastEnd = null; }
-  }
-  if (line) out.push(line);
-  return out.map(s => s.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n");
-}
-async function pdfToText(file, onPage){
-  const pdfjs = await loadPdfJs();
-  const doc = await pdfjs.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
-  const parts = [];
-  for (let i = 1; i <= doc.numPages; i++) {
-    onPage(i, doc.numPages);
-    const page = await doc.getPage(i), tc = await page.getTextContent();
-    const t = pageText(tc.items); if (t) parts.push("--- Trang " + i + " ---\n" + t);
-    page.cleanup();
-  }
-  await doc.destroy();
-  return {text: parts.join("\n\n"), pages: doc.numPages};
-}
-function renderIbFiles(){
-  $("ib-files").innerHTML = ibFiles.map((f, i) => `<div>${esc(f.name)} <small style="color:var(--muted)">(${(f.size / 1048576).toFixed(1)} MB)</small> <button class="btn sm ghost" type="button" data-i="${i}">Bỏ</button></div>`).join("");
-  $("ib-files").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { ibFiles.splice(+b.dataset.i, 1); renderIbFiles(); }));
-}
-function addIbFiles(list){
-  const st = $("ib-status"), bad = [];
-  [...list].forEach(f => { if (/\.pdf$/i.test(f.name) || f.type === "application/pdf") ibFiles.push(f); else bad.push(f.name); });
-  st.className = bad.length ? "status err" : "status"; st.textContent = bad.length ? "Chỉ nhận file PDF. Bỏ qua: " + bad.join(", ") : "";
-  renderIbFiles();
-}
-$("ib-file").addEventListener("change", e => { addIbFiles(e.target.files); e.target.value = ""; });
-["dragenter","dragover"].forEach(ev => $("ib-drop").addEventListener(ev, e => { e.preventDefault(); $("ib-drop").classList.add("on"); }));
-["dragleave","drop"].forEach(ev => $("ib-drop").addEventListener(ev, e => { e.preventDefault(); $("ib-drop").classList.remove("on"); }));
-$("ib-drop").addEventListener("drop", e => { if (e.dataTransfer && e.dataTransfer.files) addIbFiles(e.dataTransfer.files); });
-$("ibForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const st = $("ib-status"), pasted = $("ib-text").value.trim();
-  if (!ibFiles.length && !pasted) { st.className = "status err"; st.textContent = "Chọn file PDF hoặc dán nội dung trước."; return; }
-  const missIb = [["dòng máy", $("ib-name").value], ["hãng", $("ib-maker").value]].filter(x => !x[1]).map(x => x[0]);
-  if (missIb.length) { st.className = "status err"; st.textContent = "Chọn " + missIb.join(" và ") + " trước khi gửi."; $(missIb[0] === "dòng máy" ? "ib-name" : "ib-maker").focus(); return; }
-  const base = {note: $("ib-note").value.trim(), hint_name: $("ib-name").value, hint_maker: $("ib-maker").value,
-    created_by_name: ME.name || $("meName").textContent || ""};
-  const rows = [], skipped = [];
-  $("ib-send").disabled = true; st.className = "status";
-  try {
-    for (const f of ibFiles) {
-      st.textContent = "Đang đọc " + f.name + "…";
-      const r = await pdfToText(f, (i, n) => { st.textContent = "Đang đọc " + f.name + ": trang " + i + "/" + n + "…"; });
-      const letters = r.text.replace(/--- Trang \d+ ---/g, "").replace(/[^\p{L}]/gu, "").length;
-      if (letters < 200) { skipped.push(f.name + " (không có chữ, có thể là bản scan)"); continue; }
-      let text = r.text;
-      if (text.length > INBOX_MAX) { text = text.slice(0, INBOX_MAX); skipped.push(f.name + " quá dài, chỉ gửi " + Math.round(INBOX_MAX / 1000) + " nghìn ký tự đầu"); }
-      rows.push({...base, file_name: f.name, text_content: text, pages: r.pages});
-    }
-    if (pasted) rows.push({...base, file_name: "Nội dung dán", text_content: pasted.slice(0, INBOX_MAX), pages: 0});
-    if (!rows.length) throw new Error("Không có nội dung để gửi. " + skipped.join("; "));
-    st.textContent = "Đang gửi…";
-    const {error} = await sb.from("quote_inbox").insert(rows);
-    if (error) throw new Error(/relation|does not exist|schema cache/i.test(error.message) ? "Hộp thư chưa được kích hoạt trên máy chủ." : error.message);
-    ibFiles = []; renderIbFiles(); ["ib-text","ib-note"].forEach(k => $(k).value = "");
-    st.className = skipped.length ? "status err" : "status ok";
-    st.textContent = "Đã gửi " + rows.length + " yêu cầu." + (skipped.length ? " Lưu ý: " + skipped.join("; ") + "." : " Nhắn Claude \"xử lý hộp thư báo giá\" để bắt đầu.");
-    await loadInbox();
-  } catch (err) { st.className = "status err"; st.textContent = err.message || "Không gửi được."; }
-  finally { $("ib-send").disabled = false; }
-});
-/* Hộp thư chỉ dành cho Super Admin (cơ sở dữ liệu cũng chặn các tài khoản khác) */
-async function loadInbox(){
-  $("nav-inbox").hidden = !isSuper;
-  if (!isSuper) { inbox = []; $("inboxN").hidden = true; if (view === "inbox") show("lib"); return; }
-  const {data, error} = await sb.from("quote_inbox")
-    .select("id,file_name,note,hint_name,hint_maker,pages,status,result,product_ids,created_by,created_by_name,created_at,updated_at")
-    .order("created_at", {ascending: false}).limit(100);
-  inboxOk = !error; inbox = error ? [] : (data || []);
-  const n = inbox.filter(x => x.status === "new").length;
-  $("inboxN").hidden = !n; $("inboxN").textContent = n;
-  if (view === "inbox") renderInbox();
-}
-const IB_ST = {new: ["new", "Chờ Claude xử lý"], done: ["done", "Đã xử lý"], failed: ["failed", "Không xử lý được"]};
-function renderInbox(){
-  const box = $("ib-list"); box.innerHTML = "";
-  $("ib-count").textContent = inbox.length ? inbox.length + " yêu cầu" : "";
-  if (!inboxOk) { box.innerHTML = `<div class="empty">Hộp thư chưa được kích hoạt trên máy chủ.</div>`; return; }
-  if (!inbox.length) { box.innerHTML = `<div class="empty">Chưa có yêu cầu nào.</div>`; return; }
-  const myId = session && session.user ? session.user.id : "";
-  inbox.forEach(x => {
-    const d = document.createElement("div"); d.className = "ibx";
-    const [cls, label] = IB_ST[x.status] || ["", x.status];
-    const when = new Date(x.created_at).toLocaleString("vi-VN", {dateStyle: "short", timeStyle: "short"});
-    const hints = [x.hint_name, x.hint_maker].filter(Boolean).join(" · ");
-    d.innerHTML = `<div class="top"><div style="min-width:0"><div class="fn">${esc(x.file_name || "(không tên)")}</div>
-        <div class="meta">${esc([x.created_by_name, when, x.pages ? x.pages + " trang" : "", hints].filter(Boolean).join(" · "))}</div></div>
-        <span class="chip ${cls}">${esc(label)}</span></div>
-      ${x.note ? `<div class="nt">${esc(x.note)}</div>` : ""}
-      ${x.result ? `<div class="res">${esc(x.result)}</div>` : ""}
-      <div class="btns"></div>`;
-    const btns = d.querySelector(".btns");
-    (x.product_ids || []).forEach(id => {
-      const p = products.get(id); if (!p) return;
-      btns.appendChild(mkBtn((p.model || p.name) + (isDraft(p) ? " · chờ duyệt" : " · đã duyệt"), () => openEditor(id)));
-    });
-    if (x.created_by === myId || isSuper) {
-      const b = mkBtn("Xóa yêu cầu", async () => {
-        if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "Bấm lần nữa để xóa"; b.classList.add("danger"); return; }
-        const {error} = await sb.from("quote_inbox").delete().eq("id", x.id);
-        if (!error) loadInbox();
-      }, "btn sm ghost");
-      btns.appendChild(b);
-    }
-    if (!btns.children.length) btns.remove();
-    box.appendChild(d);
-  });
-}
-
 /* Không rời trang khi còn thay đổi chưa lưu */
 function guard(fn){
   if (view === "edit" && edDirty) { pendingNav = fn; $("p-leave").hidden = false; window.scrollTo(0, 0); return; }
@@ -2066,7 +1887,6 @@ async function loadProducts(){
   products = new Map(data.map(r => [r.id, ROW(r)]));
   renderLib();
   if (view === "quote") { renderItems(); refreshQuote(); }
-  if (view === "inbox") renderInbox();
   if (view === "edit") { if (editingId && products.has(editingId)) setReviewUI(products.get(editingId)); scheduleChecks(); updateSkelHint(); }
 }
 function applySettings(d){
@@ -2093,12 +1913,11 @@ async function enterApp(){
   const {data: prof} = await sb.from("profiles").select("full_name").eq("id", session.user.id).maybeSingle();
   $("meName").textContent = (prof && prof.full_name) || (session.user.email || "").split("@")[0];
   ME = {name: (prof && prof.full_name) || "", email: /internal\.saticus\.local$/.test(session.user.email || "") ? "" : (session.user.email || "")};
-  await Promise.all([loadSettings(), loadProducts(), loadTaxo(), loadSnippets(), loadInbox()]);
+  await Promise.all([loadSettings(), loadProducts(), loadTaxo(), loadSnippets()]);
   channel = sb.channel("bao-gia")
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_products"}, () => loadProducts())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_settings"}, () => loadSettings())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_snippets"}, () => loadSnippets())
-    .on("postgres_changes", {event: "*", schema: "public", table: "quote_inbox"}, () => loadInbox())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_taxonomy"}, () => loadTaxo())
     .subscribe();
 }
@@ -2129,7 +1948,7 @@ $("logout").addEventListener("click", async () => { await sb.auth.signOut(); });
   sb.auth.onAuthStateChange((event, sess) => {
     session = sess;
     if (sess) setTimeout(enterApp, 0);
-    else { entered = false; isSuper = false; canAdmin = false; $("nav-inbox").hidden = true; if (channel) { sb.removeChannel(channel); channel = null; } products = new Map(); showLogin(""); }
+    else { entered = false; isSuper = false; canAdmin = false; if (channel) { sb.removeChannel(channel); channel = null; } products = new Map(); showLogin(""); }
   });
 })();
 </script>

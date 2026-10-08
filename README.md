@@ -28,9 +28,9 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `supabase/seed.sql` – dữ liệu ban đầu: cài đặt công ty, máy LW230H (đã chạy)
 - `supabase/002_nhap_lieu.sql` – trạng thái duyệt, đoạn mẫu dùng chung, hộp thư nhập liệu
 - `supabase/003_danh_muc.sql` – danh mục dòng máy và hãng
-- `supabase/004_hop_thu_super_admin.sql` – khóa hộp thư cho Super Admin
+- `supabase/004_hop_thu_super_admin.sql` – khóa hộp thư cho Super Admin (hộp thư đã gỡ khỏi ứng dụng)
 - `supabase/005_duyet_super_admin.sql` – chỉ Super Admin duyệt model
-- `CLAUDE.md` – quy trình Claude xử lý hộp thư
+- `CLAUDE.md` – ghi chú cho Claude
 
 ## Nhập model
 
@@ -44,9 +44,11 @@ Thêm từ bản nâng cấp nhập liệu:
 - **Đoạn mẫu / Mục mẫu**: lưu và chèn đoạn mô tả hoặc bộ mục cấu hình dùng chung; gợi ý mục giống nhau ở từ 2 model.
 - **Xem nội dung bản nháp** trước khi khôi phục.
 
-## Hộp thư nhập liệu
+## Model chờ duyệt
 
-Chỉ tài khoản **Super Admin** thấy và dùng được (giao diện ẩn mục này với tài khoản khác, cơ sở dữ liệu cũng chặn). Gửi catalog PDF (ứng dụng chỉ trích phần chữ trên trình duyệt, không tải file lên) hoặc dán nội dung. Nhắn Claude "xử lý hộp thư báo giá"; Claude tạo model **Chờ duyệt**. Model chờ duyệt không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu** (tài khoản khác vẫn sửa được nhưng không duyệt được).
+Model do Claude tạo từ catalog (gửi file trong chat) ở trạng thái **Chờ duyệt**: không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu**. Tài khoản khác vẫn sửa được nhưng không duyệt được (cơ sở dữ liệu cũng chặn).
+
+(Tính năng Hộp thư nhập liệu đã gỡ khỏi ứng dụng; bảng `quote_inbox` vẫn còn trên cơ sở dữ liệu.)
 
 ## Dòng máy & hãng
 

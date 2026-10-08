@@ -4,30 +4,14 @@
 
 Dòng máy và hãng là danh mục tạo riêng trong bảng `quote_taxonomy` (`kind` = `category` / `brand`). Model chỉ được dùng tên có trong danh mục.
 
-## Quy trình "xử lý hộp thư báo giá"
+## Tạo model từ catalog người dùng gửi trong chat
 
-Khi người dùng nhắn "xử lý hộp thư báo giá" (hoặc tương tự):
+Tính năng Hộp thư nhập liệu đã gỡ khỏi ứng dụng (lấy chữ từ PDF làm hỏng bảng thông số nhiều model). Người dùng gửi catalog trực tiếp trong chat.
 
-1. Đọc danh sách yêu cầu mới (không lấy `text_content` để tránh quá dài):
-   `select id, file_name, note, hint_name, hint_maker, pages, created_by_name, length(text_content) as n from quote_inbox where status = 'new' order by created_at;`
-2. Với từng yêu cầu, đọc chữ theo từng đoạn nếu dài:
-   `select substr(text_content, 1, 60000) from quote_inbox where id = '…';`
-3. Dịch và soạn model theo skill `lam-bao-gia` (quy tắc dịch, cách đặt tiêu đề mục, cấu hình tiêu chuẩn). Bắt buộc:
-   - Chỉ dùng thông tin có trong tài liệu, không bịa. Thiếu thông tin thì để trống trường đó và ghi chú vào `result`.
-   - Làm theo `note` của người gửi (model nào, bỏ phần nào).
-   - Dòng máy và hãng do người gửi chọn từ danh mục: dùng **đúng nguyên văn** `hint_name` cho `name` và `hint_maker` cho `maker`. Không tự tạo dòng máy hay hãng mới trong `quote_taxonomy`; nếu tài liệu rõ ràng thuộc dòng máy/hãng khác thì ghi chú vào `result` để người dùng sửa.
-   - Xuất xứ: dùng cách viết đã có trong thư viện (`select distinct origin from quote_products`).
-   - Đơn vị theo cách viết của thư viện: `220V`, `5 kW`, `40°C`, `100 mL`, `150 m³/h`, `5 μS/cm`, `546 × 573 mm`.
-4. Tạo model ở trạng thái **chờ duyệt**:
-   `insert into quote_products (name, maker, model, code, origin, sections, scope, status, source) values (…, 'draft', 'Hộp thư: <file_name> (<created_by_name>)') returning id;`
-   - `sections`: `[{"title": "Cấu trúc thiết bị:", "lines": ["…"]}]`
-   - `scope`: `[{"code": "", "text": "…", "qty": "1"}]`; nhãn nhóm thì `qty` là `""`.
-5. Cập nhật yêu cầu và **xóa phần chữ** để tiết kiệm dung lượng:
-   `update quote_inbox set status = 'done', result = '<tóm tắt: tạo model nào, thiếu gì>', product_ids = '["id1","id2"]'::jsonb, text_content = '' where id = '…';`
-   - Không xử lý được (không có chữ, sai tài liệu…): `status = 'failed'`, ghi lý do vào `result`, giữ nguyên `text_content`.
-6. Báo lại cho người dùng: danh sách model đã tạo, những chỗ còn trống cần người duyệt kiểm tra.
-
-Không đổi `status` của model sang `approved`: việc duyệt do người dùng làm trên ứng dụng.
+- Dịch và soạn theo skill `lam-bao-gia`: chỉ dùng thông tin trong tài liệu; hỏi người dùng khi thiếu xuất xứ hoặc thông tin bắt buộc; không tự viết phần "Cung cấp bao gồm" (để `scope` trống).
+- Dòng máy và hãng phải có sẵn trong `quote_taxonomy`; không tự tạo mới, hỏi người dùng nếu chưa có.
+- Đơn vị theo cách viết của thư viện: `220V`, `5 kW`, `40°C`, `100 mL`, `150 m³/h`, `5 μS/cm`, `546 × 573 mm`.
+- Tạo model ở trạng thái chờ duyệt: `status = 'draft'`, `source = 'Claude: <tên file>'`. Chỉ Super Admin duyệt trên ứng dụng; không tự đổi sang `approved`.
 
 ## Kiểm thử
 
