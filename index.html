@@ -1038,7 +1038,7 @@ function saveFilters(){ LS.set("bg_fcat", fCat); LS.set("bg_fbrand", fBrand); }
 const SPEC_KEYS = [
   {re: /c[ôo]ng su[ấa]t/i, key: true}, {re: /dung t[íi]ch|th[ểe] t[íi]ch/i, key: true}, {re: /t[ảa]i tr[ọo]ng/i, key: true},
   {re: /l[ưu]u l[ưu][ợo]ng/i, key: true}, {re: /[đd]i[ệe]n [áa]p|ngu[ồo]n [đd]i[ệe]n/i}, {re: /k[íi]ch th[ưu][ớo]c/i},
-  {re: /kh[ốo]i l[ưu][ợo]ng|tr[ọo]ng l[ưu][ợo]ng/i}, {re: /nhi[ệe]t [đd][ộo]/i}
+  {re: /^(kh[ốo]i l[ưu][ợo]ng|tr[ọo]ng l[ưu][ợo]ng)(?!.*t[ốo]i (thi[ểe]u|[đd]a))/i}, {re: /nhi[ệe]t [đd][ộo]/i}
 ];
 function keySpecs(p){
   const pairs = [];
