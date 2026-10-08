@@ -352,7 +352,7 @@ details.box[open] summary{margin-bottom:10px}
         <details class="box">
           <summary>Điều khoản thương mại</summary>
           <fieldset>
-            <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Ý con (VD: từng đợt thanh toán) in thụt vào dưới điều khoản. <code>{VAT}</code> tự thay bằng mức VAT.</p>
+            <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Bấm "+ Nội dung" để thêm dòng in thụt vào dưới điều khoản (VD: từng đợt thanh toán). <code>{VAT}</code> tự thay bằng mức VAT.</p>
             <textarea id="q-terms" hidden aria-hidden="true"></textarea>
             <div class="terms-ed" id="q-termsEd"></div>
             <div class="btns"><button type="button" class="btn sm" data-add="q-termsEd">+ Thêm điều khoản</button></div>
@@ -526,7 +526,7 @@ details.box[open] summary{margin-bottom:10px}
       <label for="s-vat">VAT mặc định (%)<input id="s-vat" class="num" inputmode="decimal"></label>
       <div class="sep"></div>
       <h2>Điều khoản thương mại mặc định</h2>
-      <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Ý con (VD: từng đợt thanh toán) in thụt vào dưới điều khoản. <code>{VAT}</code> tự thay bằng mức VAT. Sales vẫn sửa được riêng cho từng báo giá.</p>
+      <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Bấm "+ Nội dung" để thêm dòng in thụt vào dưới điều khoản (VD: từng đợt thanh toán). <code>{VAT}</code> tự thay bằng mức VAT. Sales vẫn sửa được riêng cho từng báo giá.</p>
       <textarea id="s-terms" hidden aria-hidden="true"></textarea>
       <div class="terms-ed" id="s-termsEd"></div>
       <div class="btns"><button type="button" class="btn sm" data-add="s-termsEd">+ Thêm điều khoản</button></div>
@@ -1875,7 +1875,7 @@ $("p-leaveNo").addEventListener("click", () => { $("p-leave").hidden = true; pen
 window.addEventListener("beforeunload", e => { if (view === "edit" && edDirty) { e.preventDefault(); e.returnValue = ""; } });
 
 /* ---------- Soạn điều khoản theo từng khung ----------
-   Dữ liệu vẫn lưu dạng văn bản: mỗi điều khoản một dòng, ý con bắt đầu bằng "- " ngay bên dưới. */
+   Dữ liệu vẫn lưu dạng văn bản: mỗi điều khoản một dòng, các dòng nội dung bắt đầu bằng "- " ngay bên dưới. */
 const SUBMARK = /^[-+•]\s*/;
 function parseTerms(text){
   const items = [];
@@ -1899,14 +1899,14 @@ function termsEditor(boxId, taId){
     st.items.forEach((it, i) => {
       const d = document.createElement("div"); d.className = "term";
       d.innerHTML = `<div class="no">${i + 1}.</div><div class="body"><textarea rows="1" aria-label="Điều khoản ${i + 1}"></textarea></div>
-        <div class="tbar"><div class="btns"><button type="button" class="btn sm ghost" data-a="sub">+ Ý con</button></div>
+        <div class="tbar"><div class="btns"><button type="button" class="btn sm ghost" data-a="sub">+ Nội dung</button></div>
         <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm ghost" data-a="del">Xóa</button></div></div>`;
       const body = d.querySelector(".body"), main = body.querySelector("textarea");
       main.value = it.main; main.readOnly = st.ro;
       main.addEventListener("input", () => { it.main = main.value; fit(main); sync(); });
       it.subs.forEach((sv, k) => {
         const r = document.createElement("div"); r.className = "sub";
-        r.innerHTML = `<textarea rows="1" aria-label="Ý con ${k + 1} của điều khoản ${i + 1}"></textarea><button type="button" class="btn sm ghost" aria-label="Xóa ý con">Xóa</button>`;
+        r.innerHTML = `<textarea rows="1" aria-label="Nội dung ${k + 1} của điều khoản ${i + 1}"></textarea><button type="button" class="btn sm ghost" aria-label="Xóa nội dung">Xóa</button>`;
         const inp = r.querySelector("textarea"); inp.value = sv; inp.readOnly = st.ro;
         inp.addEventListener("input", () => { it.subs[k] = inp.value.replace(/\n/g, " "); fit(inp); sync(); });
         inp.addEventListener("keydown", e => { if (e.key === "Enter" && !st.ro) { e.preventDefault(); it.subs.splice(k + 1, 0, ""); render({i, k: k + 1}); sync(); } });
