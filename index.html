@@ -242,6 +242,15 @@ details.box[open] summary{margin-bottom:10px}
 .snip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px}
 .snip .tx{min-width:0;font-size:12.5px}
 .snip .tx small{display:block;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.terms-ed{display:flex;flex-direction:column;gap:8px}
+.term{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 8px;background:var(--surface)}
+.term .no{font-weight:700;font-size:13px;padding-top:9px;color:var(--title)}
+.term .body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.term textarea{resize:none;min-height:38px;overflow:hidden;line-height:1.45}
+.term .sub{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:6px;align-items:center}
+.term .sub::before{content:"–";color:var(--muted);text-align:center}
+.term .tbar{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between}
+.terms-ed.ro .tbar,.terms-ed.ro .sub .btn,.terms-ed.ro + .btns{display:none}
 .taxo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
 @media (max-width:1000px){.taxo-grid{grid-template-columns:minmax(0,1fr)}}
 .txadd{display:flex;gap:8px}
@@ -343,9 +352,10 @@ details.box[open] summary{margin-bottom:10px}
         <details class="box">
           <summary>Điều khoản thương mại</summary>
           <fieldset>
-            <label for="q-terms">Mỗi điều khoản bắt đầu một dòng mới, số thứ tự tự đánh. Dòng bắt đầu bằng <code>-</code> hoặc <code>+</code> là ý con của điều khoản phía trên. <code>{VAT}</code> tự thay bằng mức VAT.
-              <textarea id="q-terms" rows="12"></textarea>
-            </label>
+            <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Ý con (VD: từng đợt thanh toán) in thụt vào dưới điều khoản. <code>{VAT}</code> tự thay bằng mức VAT.</p>
+            <textarea id="q-terms" hidden aria-hidden="true"></textarea>
+            <div class="terms-ed" id="q-termsEd"></div>
+            <div class="btns"><button type="button" class="btn sm" data-add="q-termsEd">+ Thêm điều khoản</button></div>
             <div class="btns"><button type="button" class="btn sm" id="q-resetTerms">Khôi phục điều khoản mặc định</button></div>
           </fieldset>
         </details>
@@ -514,7 +524,12 @@ details.box[open] summary{margin-bottom:10px}
         <label for="s-signName">Tên người ký<input id="s-signName" placeholder="Để trống để ký tay"></label>
       </div>
       <label for="s-vat">VAT mặc định (%)<input id="s-vat" class="num" inputmode="decimal"></label>
-      <label for="s-terms">Điều khoản mặc định (cùng quy tắc như ở màn hình xuất báo giá)<textarea id="s-terms" rows="14"></textarea></label>
+      <div class="sep"></div>
+      <h2>Điều khoản thương mại mặc định</h2>
+      <p class="hint">Mỗi khung là một điều khoản, số thứ tự tự đánh. Ý con (VD: từng đợt thanh toán) in thụt vào dưới điều khoản. <code>{VAT}</code> tự thay bằng mức VAT. Sales vẫn sửa được riêng cho từng báo giá.</p>
+      <textarea id="s-terms" hidden aria-hidden="true"></textarea>
+      <div class="terms-ed" id="s-termsEd"></div>
+      <div class="btns"><button type="button" class="btn sm" data-add="s-termsEd">+ Thêm điều khoản</button></div>
       <div class="btns"><button class="btn primary" type="submit" id="s-save">Lưu cài đặt</button></div>
       <p class="status" id="s-status" role="status"></p>
     </form>
@@ -800,6 +815,7 @@ function show(v){
   const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", taxo: "nav-taxo", set: "nav-set"}[v];
   ["nav-lib","nav-new","nav-taxo","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
+  if (typeof TERMS !== "undefined") requestAnimationFrame(() => Object.values(TERMS).forEach(t => t.fit && t.fit()));
 }
 $("nav-lib").addEventListener("click", () => guard(() => show("lib")));
 $("nav-set").addEventListener("click", () => guard(() => show("set")));
@@ -926,7 +942,7 @@ function openQuote(){
   $("q-cust").value = quote.customer || ""; $("q-addr").value = quote.address || ""; $("q-date").value = quote.date || today();
   const sd = senderDefault();
   $("q-sname").value = quote.sname || sd.name || ""; $("q-stel").value = quote.stel || sd.tel || ""; $("q-semail").value = quote.semail || sd.email || "";
-  $("q-terms").value = quote.terms ?? settings.terms;
+  $("q-terms").value = quote.terms ?? settings.terms; TERMS["q-termsEd"].load();
   renderItems(); refreshQuote(); show("quote"); $("q-status").textContent = ""; fitPaper();
 }
 function renderItems(){
@@ -969,7 +985,7 @@ $("q-ssave").addEventListener("click", () => {
   LS.set(senderKey(), {name: $("q-sname").value.trim(), tel: $("q-stel").value.trim(), email: $("q-semail").value.trim()});
   $("q-sstatus").className = "status ok"; $("q-sstatus").textContent = "Đã lưu. Báo giá sau sẽ tự điền.";
 });
-$("q-resetTerms").addEventListener("click", () => { $("q-terms").value = settings.terms; refreshQuote(); });
+$("q-resetTerms").addEventListener("click", () => { $("q-terms").value = settings.terms; TERMS["q-termsEd"].load(); refreshQuote(); });
 $("q-clear").addEventListener("click", () => { ["cust","addr"].forEach(k => $("q-" + k).value = ""); $("q-date").value = today(); refreshQuote(); });
 
 function refreshQuote(){
@@ -1858,12 +1874,75 @@ $("p-leaveYes").addEventListener("click", () => { $("p-leave").hidden = true; ed
 $("p-leaveNo").addEventListener("click", () => { $("p-leave").hidden = true; pendingNav = null; });
 window.addEventListener("beforeunload", e => { if (view === "edit" && edDirty) { e.preventDefault(); e.returnValue = ""; } });
 
+/* ---------- Soạn điều khoản theo từng khung ----------
+   Dữ liệu vẫn lưu dạng văn bản: mỗi điều khoản một dòng, ý con bắt đầu bằng "- " ngay bên dưới. */
+const SUBMARK = /^[-+•]\s*/;
+function parseTerms(text){
+  const items = [];
+  String(text || "").split(/\r?\n/).forEach(raw => {
+    const l = raw.trim(); if (!l) return;
+    if (SUBMARK.test(l) && items.length) items[items.length - 1].subs.push(l.replace(SUBMARK, ""));
+    else items.push({main: l.replace(/^\d+[.)]\s*/, ""), subs: []});
+  });
+  return items;
+}
+const termsText = items => items.filter(it => it.main.trim() || it.subs.some(x => x.trim()))
+  .map(it => [it.main.replace(/\s*\n\s*/g, " ").trim(), ...it.subs.filter(x => x.trim()).map(x => "- " + x.replace(/\s*\n\s*/g, " ").trim())].join("\n")).join("\n");
+const TERMS = {};
+function termsEditor(boxId, taId){
+  const box = $(boxId), ta = $(taId), st = TERMS[boxId] = {items: [], ro: false};
+  const sync = () => { ta.value = termsText(st.items); ta.dispatchEvent(new Event("input", {bubbles: true})); };
+  const fit = el => { el.style.height = "auto"; el.style.height = Math.max(38, el.scrollHeight + 2) + "px"; };
+  const render = focus => {
+    box.innerHTML = ""; box.classList.toggle("ro", st.ro);
+    if (!st.items.length) box.innerHTML = `<p class="hint">Chưa có điều khoản nào.</p>`;
+    st.items.forEach((it, i) => {
+      const d = document.createElement("div"); d.className = "term";
+      d.innerHTML = `<div class="no">${i + 1}.</div><div class="body"><textarea rows="1" aria-label="Điều khoản ${i + 1}"></textarea></div>
+        <div class="tbar"><div class="btns"><button type="button" class="btn sm ghost" data-a="sub">+ Ý con</button></div>
+        <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm ghost" data-a="del">Xóa</button></div></div>`;
+      const body = d.querySelector(".body"), main = body.querySelector("textarea");
+      main.value = it.main; main.readOnly = st.ro;
+      main.addEventListener("input", () => { it.main = main.value; fit(main); sync(); });
+      it.subs.forEach((sv, k) => {
+        const r = document.createElement("div"); r.className = "sub";
+        r.innerHTML = `<textarea rows="1" aria-label="Ý con ${k + 1} của điều khoản ${i + 1}"></textarea><button type="button" class="btn sm ghost" aria-label="Xóa ý con">Xóa</button>`;
+        const inp = r.querySelector("textarea"); inp.value = sv; inp.readOnly = st.ro;
+        inp.addEventListener("input", () => { it.subs[k] = inp.value.replace(/\n/g, " "); fit(inp); sync(); });
+        inp.addEventListener("keydown", e => { if (e.key === "Enter" && !st.ro) { e.preventDefault(); it.subs.splice(k + 1, 0, ""); render({i, k: k + 1}); sync(); } });
+        r.querySelector("button").addEventListener("click", () => { it.subs.splice(k, 1); render(); sync(); });
+        body.appendChild(r);
+      });
+      d.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", () => {
+        const a = b.dataset.a;
+        if (a === "sub") { it.subs.push(""); render({i, k: it.subs.length - 1}); sync(); return; }
+        if (a === "del") st.items.splice(i, 1);
+        if (a === "up" && i > 0) [st.items[i - 1], st.items[i]] = [st.items[i], st.items[i - 1]];
+        if (a === "down" && i < st.items.length - 1) [st.items[i + 1], st.items[i]] = [st.items[i], st.items[i + 1]];
+        render(); sync();
+      }));
+      box.appendChild(d);
+    });
+    requestAnimationFrame(st.fit);
+    if (focus) { const t = box.querySelectorAll(".term")[focus.i]; const el = t && (focus.k != null ? t.querySelectorAll(".sub textarea")[focus.k] : t.querySelector("textarea")); if (el) el.focus(); }
+  };
+  /* Khung đang ẩn thì chưa đo được chiều cao: đo lại khi hiện ra */
+  st.fit = () => box.querySelectorAll("textarea").forEach(el => { if (el.offsetParent) fit(el); });
+  st.load = () => { st.items = parseTerms(ta.value); render(); };
+  document.querySelector(`[data-add="${boxId}"]`).addEventListener("click", () => { st.items.push({main: "", subs: []}); render({i: st.items.length - 1}); sync(); });
+  return st;
+}
+termsEditor("q-termsEd", "q-terms"); termsEditor("s-termsEd", "s-terms");
+document.querySelectorAll("details.box").forEach(d => d.addEventListener("toggle", () => { if (d.open) TERMS["q-termsEd"].fit(); }));
+window.addEventListener("resize", () => Object.values(TERMS).forEach(t => t.fit()));
+
 /* ---------- Cài đặt ---------- */
 const SF = {co: "companyName", hdr: "header", intro: "intro", signTitle: "signTitle", signName: "signName"};
 function fillSettings(){
   Object.entries(SF).forEach(([k, f]) => $("s-" + k).value = settings[f] || "");
   $("s-vat").value = settings.vat; $("s-terms").value = settings.terms;
   const ro = !canAdmin; document.querySelectorAll("#setForm input,#setForm textarea").forEach(el => el.readOnly = ro);
+  TERMS["s-termsEd"].ro = ro; TERMS["s-termsEd"].load();
   $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ Admin hoặc Super Admin sửa được cài đặt." : "";
 }
 $("setForm").addEventListener("submit", async e => {
