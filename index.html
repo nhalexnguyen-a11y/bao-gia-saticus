@@ -253,6 +253,15 @@ details.box[open] summary{margin-bottom:10px}
 .ibx .res{font-size:12.5px;white-space:pre-line;overflow-wrap:anywhere}
 .drop{border:1.5px dashed var(--line2);border-radius:14px;padding:16px;text-align:center;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:8px;align-items:center}
 .drop.on{border-color:var(--ink);background:var(--soft)}
+.taxo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+@media (max-width:1000px){.taxo-grid{grid-template-columns:minmax(0,1fr)}}
+.txadd{display:flex;gap:8px}
+.txadd input{flex:1}
+.txlist{display:flex;flex-direction:column}
+.txrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 4px;border-top:1px solid var(--line)}
+.txrow .nm{font-weight:600;font-size:13.5px;overflow-wrap:anywhere}
+.txrow .nm small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.txrow .edit{display:flex;gap:6px;align-items:center}
 .flist-files{font-size:12.5px;color:var(--fg);text-align:left;width:100%;display:flex;flex-direction:column;gap:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -279,6 +288,7 @@ details.box[open] summary{margin-bottom:10px}
   <nav class="nav">
     <button type="button" id="nav-lib" aria-current="page">Thư viện báo giá</button>
     <button type="button" id="nav-new">Thêm model</button>
+    <button type="button" id="nav-taxo">Dòng máy &amp; hãng</button>
     <button type="button" id="nav-inbox">Hộp thư nhập liệu<span class="nbadge" id="inboxN" hidden></span></button>
     <button type="button" id="nav-set">Cài đặt</button>
     <a id="nav-gor" href="https://alex-workspace.pages.dev/app">← Về GOR</a>
@@ -401,15 +411,16 @@ details.box[open] summary{margin-bottom:10px}
         <div class="panel">
           <h2>Thông tin chung</h2>
           <div class="row">
-            <label for="p-name">Dòng máy *<input id="p-name" list="dl-cat" placeholder="VD: Máy Rửa Dụng Cụ"></label>
-            <label for="p-maker">Hãng (NSX) *<input id="p-maker" list="dl-brand" placeholder="VD: Eurping"></label>
+            <label for="p-name">Dòng máy *<select id="p-name"></select></label>
+            <label for="p-maker">Hãng (NSX) *<select id="p-maker"></select></label>
           </div>
           <div class="row">
             <label for="p-model">Model *<input id="p-model" placeholder="VD: LW230H"></label>
             <label for="p-code">Mã đặt hàng<input id="p-code"></label>
             <label for="p-origin">Xuất xứ<input id="p-origin" list="dl-origin" placeholder="VD: Đức"></label>
           </div>
-          <datalist id="dl-cat"></datalist><datalist id="dl-brand"></datalist><datalist id="dl-origin"></datalist>
+          <datalist id="dl-origin"></datalist>
+          <p class="hint">Chưa có dòng máy hoặc hãng cần dùng? Tạo ở trang <a href="#" class="taxo-link">Dòng máy &amp; hãng</a>.</p>
           <p class="status err" id="p-dupWarn" hidden></p>
         </div>
 
@@ -481,6 +492,26 @@ details.box[open] summary{margin-bottom:10px}
     </div>
   </section>
 
+  <!-- DÒNG MÁY & HÃNG -->
+  <section id="view-taxo" hidden>
+    <div class="pagehead"><div><h1>Dòng máy &amp; hãng</h1><p>Tạo danh mục ở đây. Khi thêm model hoặc gửi catalog, người dùng chọn dòng máy và hãng từ danh sách này.</p></div></div>
+    <div class="banner" id="tx-off" hidden>Danh mục chưa được kích hoạt trên cơ sở dữ liệu (thiếu bảng quote_taxonomy). Danh sách dưới đây lấy tạm từ các model đang có.</div>
+    <div class="taxo-grid">
+      <div class="panel">
+        <div class="h2row"><h2>Dòng máy</h2><span class="count" id="tx-category-n"></span></div>
+        <form class="txadd" id="tx-category-form" autocomplete="off"><input id="tx-category-new" placeholder="VD: Tủ An Toàn Sinh Học" aria-label="Tên dòng máy mới"><button class="btn primary" type="submit">Thêm</button></form>
+        <p class="status" id="tx-category-st" role="status"></p>
+        <div class="txlist" id="tx-category-list"></div>
+      </div>
+      <div class="panel">
+        <div class="h2row"><h2>Hãng</h2><span class="count" id="tx-brand-n"></span></div>
+        <form class="txadd" id="tx-brand-form" autocomplete="off"><input id="tx-brand-new" placeholder="VD: Eurping" aria-label="Tên hãng mới"><button class="btn primary" type="submit">Thêm</button></form>
+        <p class="status" id="tx-brand-st" role="status"></p>
+        <div class="txlist" id="tx-brand-list"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- HỘP THƯ NHẬP LIỆU -->
   <section id="view-inbox" hidden>
     <div class="pagehead"><div><h1>Hộp thư nhập liệu</h1><p>Gửi catalog cho Claude dịch và tạo model. Model tạo ra ở trạng thái Chờ duyệt, cần người kiểm tra trước khi đưa vào báo giá.</p></div></div>
@@ -496,9 +527,10 @@ details.box[open] summary{margin-bottom:10px}
         <p class="hint">Ứng dụng chỉ lấy phần chữ trong PDF ngay trên máy bạn rồi gửi phần chữ đó; file PDF không được tải lên. PDF dạng ảnh scan không lấy được chữ, khi đó hãy gửi file trực tiếp cho Claude trong chat.</p>
         <label for="ib-text">Hoặc dán nội dung (từ Word, email, trang web…)<textarea id="ib-text" rows="5"></textarea></label>
         <div class="row">
-          <label for="ib-name">Dòng máy (nếu biết)<input id="ib-name" list="dl-cat"></label>
-          <label for="ib-maker">Hãng (nếu biết)<input id="ib-maker" list="dl-brand"></label>
+          <label for="ib-name">Dòng máy *<select id="ib-name"></select></label>
+          <label for="ib-maker">Hãng *<select id="ib-maker"></select></label>
         </div>
+        <p class="hint" style="margin-top:-6px">Chọn từ danh mục. Chưa có thì tạo ở trang <a href="#" class="taxo-link">Dòng máy &amp; hãng</a>.</p>
         <label for="ib-note">Yêu cầu cho Claude<textarea id="ib-note" rows="3" placeholder="VD: Chỉ lấy model A220, xuất xứ Đức, bỏ phần phụ kiện tùy chọn."></textarea></label>
         <div class="btns"><button class="btn primary" type="submit" id="ib-send">Gửi vào hộp thư</button></div>
         <p class="status" id="ib-status" role="status"></p>
@@ -802,20 +834,23 @@ let selected = LS.get("bg_sel") || [];                // id model đã chọn, t
 let lines = LS.get("bg_lines") || {};                // id -> {qty, price, scope:[{include, qty}]}
 let quote = LS.get("bg_quote") || {};                 // thông tin khách, ngày, VAT, điều khoản
 let editingId = null, edScope = [], view = "lib";
+let taxo = {category: [], brand: []}, taxoOk = true;
 let snippets = [], snippetsOk = true, inbox = [], inboxOk = true, onlyDraft = false;
 const isDraft = p => !!p && p.status === "draft";
 
 /* ---------- Điều hướng ---------- */
 function show(v){
   view = v;
-  ["lib","quote","edit","inbox","set"].forEach(x => $("view-" + x).hidden = x !== v);
-  const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", inbox: "nav-inbox", set: "nav-set"}[v];
-  ["nav-lib","nav-new","nav-inbox","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
+  ["lib","quote","edit","taxo","inbox","set"].forEach(x => $("view-" + x).hidden = x !== v);
+  const cur = {lib: "nav-lib", quote: "nav-lib", edit: editingId ? "" : "nav-new", taxo: "nav-taxo", inbox: "nav-inbox", set: "nav-set"}[v];
+  ["nav-lib","nav-new","nav-taxo","nav-inbox","nav-set"].forEach(id => id === cur ? $(id).setAttribute("aria-current", "page") : $(id).removeAttribute("aria-current"));
   renderSelbar(); window.scrollTo(0, 0);
 }
 $("nav-lib").addEventListener("click", () => guard(() => show("lib")));
 $("nav-set").addEventListener("click", () => guard(() => show("set")));
 $("nav-inbox").addEventListener("click", () => guard(() => { renderInbox(); show("inbox"); }));
+$("nav-taxo").addEventListener("click", () => guard(() => { renderTaxo(); show("taxo"); }));
+document.querySelectorAll(".taxo-link").forEach(a => a.addEventListener("click", e => { e.preventDefault(); guard(() => { renderTaxo(); show("taxo"); }); }));
 $("nav-new").addEventListener("click", () => guard(() => openEditor(null)));
 $("q-back").addEventListener("click", () => show("lib"));
 $("p-back").addEventListener("click", () => guard(() => show("lib")));
@@ -828,10 +863,10 @@ function fbtn(label, n, on, onClick){
 }
 function renderFilters(){
   const all = [...products.values()];
-  const cats = [...new Set(all.map(catOf))].sort(vsort);
+  const cats = [...new Set([...taxoNames("category"), ...all.map(catOf)])].sort(vsort);
   if (fCat && !cats.includes(fCat)) fCat = "";
   const inCat = all.filter(p => !fCat || catOf(p) === fCat);
-  const brands = [...new Set(inCat.map(brandOf))].sort(vsort);
+  const brands = [...new Set([...(fCat ? [] : taxoNames("brand")), ...inCat.map(brandOf)])].sort(vsort);
   if (fBrand && !brands.includes(fBrand)) fBrand = "";
   const fc = $("f-cat"); fc.innerHTML = "";
   fc.appendChild(fbtn("Tất cả dòng máy", all.length, !fCat, () => { fCat = ""; fBrand = ""; saveFilters(); renderLib(); }));
@@ -840,9 +875,8 @@ function renderFilters(){
   fb.appendChild(fbtn("Tất cả hãng", inCat.length, !fBrand, () => { fBrand = ""; saveFilters(); renderLib(); }));
   brands.forEach(bn => fb.appendChild(fbtn(bn, inCat.filter(p => brandOf(p) === bn).length, fBrand === bn, () => { fBrand = bn; saveFilters(); renderLib(); })));
   // gợi ý khi nhập model mới
-  $("dl-cat").innerHTML = cats.map(x => `<option value="${esc(x)}">`).join("");
   $("dl-origin").innerHTML = [...new Set(all.map(p => (p.origin||"").trim()).filter(Boolean))].sort(vsort).map(x => `<option value="${esc(x)}">`).join("");
-  $("dl-brand").innerHTML = [...new Set(all.map(p => (p.maker||"").trim()).filter(Boolean))].sort(vsort).map(x => `<option value="${esc(x)}">`).join("");
+  fillTaxoSelects();
 }
 function saveFilters(){ LS.set("bg_fcat", fCat); LS.set("bg_fbrand", fBrand); }
 function renderLib(){
@@ -855,7 +889,13 @@ function renderLib(){
   $("l-count").textContent = list.length + " model";
   const box = $("l-list"); box.innerHTML = "";
   if (!products.size) { box.innerHTML = `<div class="empty">Thư viện chưa có model nào. Bấm "Thêm model" để tạo báo giá đầu tiên, hoặc gửi catalog cho Claude để nạp vào.</div>`; renderSelbar(); return; }
-  if (!list.length) { box.innerHTML = `<div class="empty">Không có model khớp bộ lọc hoặc từ khóa.</div>`; renderSelbar(); return; }
+  if (!list.length) {
+    const emptyCat = fCat && !q.trim() && ![...products.values()].some(p => catOf(p) === fCat);
+    box.innerHTML = emptyCat ? `<div class="empty">Dòng máy ${esc(fCat)} chưa có model nào.<div class="btns" style="justify-content:center;margin-top:10px"><button class="btn" type="button" id="l-addHere">+ Thêm model vào dòng này</button></div></div>`
+      : `<div class="empty">Không có model khớp bộ lọc hoặc từ khóa.</div>`;
+    if (emptyCat) $("l-addHere").addEventListener("click", () => openEditor(null, {name: fCat}));
+    renderSelbar(); return;
+  }
   const byCat = new Map();
   list.forEach(p => { const k = catOf(p); if (!byCat.has(k)) byCat.set(k, new Map()); const m = byCat.get(k); const b = brandOf(p); if (!m.has(b)) m.set(b, []); m.get(b).push(p); });
   [...byCat.keys()].sort(vsort).forEach(cname => {
@@ -1083,7 +1123,7 @@ function editorSnapshot(){
     origin: $("p-origin").value, body: $("p-body").value, scope: edScope.map(x => ({...x}))};
 }
 function fillEditor(d){
-  $("p-name").value = d.name || ""; $("p-maker").value = d.maker || ""; $("p-model").value = d.model || "";
+  setSel("p-name", d.name); setSel("p-maker", d.maker); $("p-model").value = d.model || "";
   $("p-code").value = d.code || ""; $("p-origin").value = d.origin || "";
   $("p-body").value = d.body != null ? d.body : bodyToText(d.sections);
   edScope = (d.scope || []).map(it => ({code: it.code || "", text: it.text || "", qty: it.qty ?? ""}));
@@ -1102,7 +1142,7 @@ function openEditor(id, opts = {}){
   $("p-title").textContent = p ? "Sửa model" : "Thêm model";
   $("p-sub").textContent = p ? [p.name, p.maker].filter(Boolean).join(" · ") : "Dòng máy và hãng dùng để nhóm, lọc trong thư viện.";
   if (p) fillEditor(p);
-  else fillEditor({name: opts.name ?? (fCat || ""), maker: opts.maker ?? (fBrand && fBrand !== NO ? fBrand : ""), origin: opts.origin || ""});
+  else fillEditor({name: opts.name ?? (fCat && inTaxo("category", fCat) ? fCat : ""), maker: opts.maker ?? (fBrand && inTaxo("brand", fBrand) ? fBrand : ""), origin: opts.origin || ""});
   $("p-del").hidden = !p; $("p-dup").hidden = !p; $("p-confirm").hidden = true; $("p-leave").hidden = true;
   $("p-status").textContent = ""; $("p-status").className = "status"; $("p-xlsxStatus").textContent = "";
   $("p-xlsxPick").hidden = true; $("p-xlsxUse").hidden = true; $("p-pasteBox").hidden = true;
@@ -1358,8 +1398,10 @@ function useImported(p){
   fillEditor(p); edDirty = true; saveDraft();
   const missing = [["Dòng máy", p.name], ["Hãng", p.maker], ["Model", p.model], ["Xuất xứ", p.origin]].filter(x => !x[1]).map(x => x[0]);
   const ns = p.sections.filter(s => s.title).length, nc = p.scope.filter(s => !isLabel(s)).length;
-  $("p-xlsxStatus").className = missing.length ? "status err" : "status ok";
-  $("p-xlsxStatus").textContent = "Đã đọc " + ns + " mục mô tả, " + nc + " mục cấu hình." + (missing.length ? " Còn trống: " + missing.join(", ") + "." : "") + " Kiểm tra lại rồi bấm Lưu.";
+  const notIn = [["Dòng máy", "p-name"], ["Hãng", "p-maker"]].filter(([, id]) => $(id).value && !inTaxo(SEL[id], $(id).value)).map(([l, id]) => l + " \"" + $(id).value + "\"");
+  $("p-xlsxStatus").className = missing.length || notIn.length ? "status err" : "status ok";
+  $("p-xlsxStatus").textContent = "Đã đọc " + ns + " mục mô tả, " + nc + " mục cấu hình." + (missing.length ? " Còn trống: " + missing.join(", ") + "." : "")
+    + (notIn.length ? " " + notIn.join(", ") + " trong file chưa có trong danh mục: chọn lại cho đúng, hoặc tạo ở trang Dòng máy & hãng." : "") + " Kiểm tra lại rồi bấm Lưu.";
 }
 $("p-xlsx").addEventListener("change", async e => {
   const file = e.target.files[0]; e.target.value = ""; if (!file) return;
@@ -1394,6 +1436,8 @@ async function saveEditor(next, approve){
   const d = readEditor();
   const miss = [["Dòng máy", d.name], ["Hãng", d.maker], ["Model", d.model]].filter(x => !x[1]).map(x => x[0]);
   if (miss.length) { s.className = "status err"; s.textContent = "Cần nhập: " + miss.join(", ") + "."; ({"Dòng máy": $("p-name"), "Hãng": $("p-maker"), "Model": $("p-model")})[miss[0]].focus(); return; }
+  const notIn = [["Dòng máy", "category", d.name], ["Hãng", "brand", d.maker]].filter(x => !inTaxo(x[1], x[2])).map(x => x[0] + " \"" + x[2] + "\"");
+  if (notIn.length) { s.className = "status err"; s.textContent = notIn.join(", ") + " chưa có trong danh mục. Chọn lại, hoặc tạo ở trang Dòng máy & hãng."; return; }
   if (checkDup() && !dupAck) { dupAck = true; s.className = "status err"; s.textContent = "Model này đã có trong thư viện. Bấm Lưu lần nữa nếu vẫn muốn lưu thêm."; return; }
   renderChecks();
   const warns = runChecks().filter(c => c.level === "warn");
@@ -1748,6 +1792,107 @@ function renderSScopeBox(){
 }
 $("p-sSnipOpen").addEventListener("click", () => toggleBox($("p-sSnipOpen"), $("p-sSnipBox"), renderSScopeBox));
 
+/* ---------- Dòng máy & hãng (danh mục tạo riêng) ---------- */
+const TX = {category: {field: "name", label: "dòng máy"}, brand: {field: "maker", label: "hãng"}};
+const SEL = {"p-name": "category", "p-maker": "brand", "ib-name": "category", "ib-maker": "brand"};
+/* Khi chưa có bảng danh mục thì lấy tạm từ các model đang có, để ứng dụng vẫn chạy */
+function taxoNames(kind){
+  if (taxoOk) return taxo[kind].map(x => x.name);
+  const f = TX[kind].field;
+  return [...new Set([...products.values()].map(p => norm(p[f])).filter(Boolean))].sort(vsort);
+}
+const inTaxo = (kind, v) => !taxoOk || taxoNames(kind).includes(v);
+const usage = (kind, name) => [...products.values()].filter(p => norm(p[TX[kind].field]) === name).length;
+function fillTaxoSelects(){
+  Object.entries(SEL).forEach(([id, kind]) => {
+    const el = $(id), cur = el.value, names = taxoNames(kind);
+    el.innerHTML = `<option value="">— Chọn ${TX[kind].label} —</option>` + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
+    if (cur) { if (!names.includes(cur)) el.add(new Option(cur + " (chưa có trong danh mục)", cur)); el.value = cur; }
+  });
+}
+/* Chọn giá trị; khác hoa/thường hoặc khoảng trắng thì lấy đúng tên trong danh mục */
+function setSel(id, val){
+  const el = $(id), kind = SEL[id]; val = norm(val);
+  if (!el.options.length) fillTaxoSelects();
+  const hit = val && taxoNames(kind).find(x => key(x) === key(val));
+  if (hit) val = hit;
+  if (val && ![...el.options].some(o => o.value === val)) el.add(new Option(val + " (chưa có trong danh mục)", val));
+  el.value = val || "";
+}
+async function loadTaxo(){
+  const {data, error} = await sb.from("quote_taxonomy").select("id,kind,name");
+  taxoOk = !error; taxo = {category: [], brand: []};
+  (data || []).forEach(r => { if (taxo[r.kind]) taxo[r.kind].push(r); });
+  Object.values(taxo).forEach(a => a.sort((x, y) => vsort(x.name, y.name)));
+  renderLib(); if (view === "taxo") renderTaxo();
+}
+function txStatus(kind, cls, msg){ const st = $("tx-" + kind + "-st"); st.className = "status " + cls; st.textContent = msg; }
+function renderTaxo(){
+  $("tx-off").hidden = taxoOk;
+  ["category", "brand"].forEach(kind => {
+    const names = taxoNames(kind), box = $("tx-" + kind + "-list"), lb = TX[kind].label; box.innerHTML = "";
+    $("tx-" + kind + "-n").textContent = names.length + " " + lb;
+    $("tx-" + kind + "-form").querySelectorAll("input,button").forEach(el => el.disabled = !taxoOk);
+    if (!names.length) box.innerHTML = `<p class="hint">Chưa có ${lb} nào.</p>`;
+    names.forEach(name => {
+      const n = usage(kind, name), row = document.createElement("div"); row.className = "txrow";
+      const showRow = () => {
+        row.innerHTML = `<div class="nm">${esc(name)}<small>${n ? n + " model" : "Chưa có model"}</small></div><div class="btns"></div>`;
+        if (!taxoOk) return;
+        const b = row.querySelector(".btns");
+        b.appendChild(mkBtn("Đổi tên", editRow));
+        const del = mkBtn("Xóa", async () => {
+          if (n) return;
+          if (del.dataset.sure !== "1") { del.dataset.sure = "1"; del.textContent = "Bấm lần nữa để xóa"; del.classList.add("danger"); return; }
+          await removeTaxo(kind, name);
+        }, "btn sm ghost");
+        if (n) { del.disabled = true; del.title = "Đang có " + n + " model thuộc " + lb + " này. Chuyển các model sang " + lb + " khác trước khi xóa."; }
+        b.appendChild(del);
+      };
+      const editRow = () => {
+        row.innerHTML = `<div class="edit"><input aria-label="Tên mới cho ${esc(name)}" value="${esc(name)}"></div><div class="btns"></div>`;
+        const inp = row.querySelector("input"), b = row.querySelector(".btns");
+        b.appendChild(mkBtn("Lưu", () => renameTaxo(kind, name, inp.value), "btn sm primary"));
+        b.appendChild(mkBtn("Hủy", showRow, "btn sm ghost"));
+        inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); renameTaxo(kind, name, inp.value); } if (e.key === "Escape") showRow(); });
+        inp.focus(); inp.select();
+        if (n) txStatus(kind, "", "Đổi tên sẽ cập nhật luôn " + n + " model đang dùng " + lb + " này.");
+      };
+      showRow(); box.appendChild(row);
+    });
+  });
+}
+async function addTaxo(kind){
+  const inp = $("tx-" + kind + "-new"), name = norm(inp.value), lb = TX[kind].label;
+  if (!name) { txStatus(kind, "err", "Nhập tên " + lb + "."); inp.focus(); return; }
+  const dup = taxoNames(kind).find(x => key(x) === key(name));
+  if (dup) { txStatus(kind, "err", "Đã có " + lb + " " + dup + "."); return; }
+  const {error} = await sb.from("quote_taxonomy").insert({kind, name});
+  if (error) { txStatus(kind, "err", "Không thêm được: " + error.message); return; }
+  inp.value = ""; await loadTaxo(); txStatus(kind, "ok", "Đã thêm " + lb + " " + name + "."); inp.focus();
+}
+async function renameTaxo(kind, old, nv){
+  nv = norm(nv); const lb = TX[kind].label, f = TX[kind].field;
+  if (!nv || nv === old) { renderTaxo(); return; }
+  if (taxoNames(kind).some(x => x !== old && key(x) === key(nv))) { txStatus(kind, "err", "Đã có " + lb + " " + nv + "."); return; }
+  const row = taxo[kind].find(x => x.name === old); if (!row) return;
+  const {error} = await sb.from("quote_taxonomy").update({name: nv}).eq("id", row.id);
+  if (error) { txStatus(kind, "err", "Không đổi được tên: " + error.message); return; }
+  const n = usage(kind, old);
+  if (n) { const {error: e2} = await sb.from("quote_products").update({[f]: nv}).eq(f, old); if (e2) txStatus(kind, "err", "Đã đổi tên trong danh mục nhưng chưa cập nhật được model: " + e2.message); }
+  if (kind === "category" && fCat === old) fCat = nv;
+  if (kind === "brand" && fBrand === old) fBrand = nv;
+  saveFilters(); await loadTaxo(); await loadProducts(); renderTaxo();
+  txStatus(kind, "ok", "Đã đổi " + old + " thành " + nv + (n ? ", cập nhật " + n + " model." : "."));
+}
+async function removeTaxo(kind, name){
+  const row = taxo[kind].find(x => x.name === name); if (!row) return;
+  const {error} = await sb.from("quote_taxonomy").delete().eq("id", row.id);
+  if (error) { txStatus(kind, "err", "Không xóa được: " + error.message); return; }
+  await loadTaxo(); txStatus(kind, "ok", "Đã xóa " + TX[kind].label + " " + name + ".");
+}
+["category", "brand"].forEach(kind => $("tx-" + kind + "-form").addEventListener("submit", e => { e.preventDefault(); addTaxo(kind); }));
+
 /* ---------- Hộp thư nhập liệu ---------- */
 const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/";
 const INBOX_MAX = 400000;
@@ -1805,7 +1950,9 @@ $("ibForm").addEventListener("submit", async e => {
   e.preventDefault();
   const st = $("ib-status"), pasted = $("ib-text").value.trim();
   if (!ibFiles.length && !pasted) { st.className = "status err"; st.textContent = "Chọn file PDF hoặc dán nội dung trước."; return; }
-  const base = {note: $("ib-note").value.trim(), hint_name: canonical($("ib-name").value, "name"), hint_maker: canonical($("ib-maker").value, "maker"),
+  const missIb = [["dòng máy", $("ib-name").value], ["hãng", $("ib-maker").value]].filter(x => !x[1]).map(x => x[0]);
+  if (missIb.length) { st.className = "status err"; st.textContent = "Chọn " + missIb.join(" và ") + " trước khi gửi."; $(missIb[0] === "dòng máy" ? "ib-name" : "ib-maker").focus(); return; }
+  const base = {note: $("ib-note").value.trim(), hint_name: $("ib-name").value, hint_maker: $("ib-maker").value,
     created_by_name: ME.name || $("meName").textContent || ""};
   const rows = [], skipped = [];
   $("ib-send").disabled = true; st.className = "status";
@@ -1941,12 +2088,13 @@ async function enterApp(){
   const {data: prof} = await sb.from("profiles").select("full_name").eq("id", session.user.id).maybeSingle();
   $("meName").textContent = (prof && prof.full_name) || (session.user.email || "").split("@")[0];
   ME = {name: (prof && prof.full_name) || "", email: /internal\.saticus\.local$/.test(session.user.email || "") ? "" : (session.user.email || "")};
-  await Promise.all([loadSettings(), loadProducts(), loadSnippets(), loadInbox()]);
+  await Promise.all([loadSettings(), loadProducts(), loadTaxo(), loadSnippets(), loadInbox()]);
   channel = sb.channel("bao-gia")
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_products"}, () => loadProducts())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_settings"}, () => loadSettings())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_snippets"}, () => loadSnippets())
     .on("postgres_changes", {event: "*", schema: "public", table: "quote_inbox"}, () => loadInbox())
+    .on("postgres_changes", {event: "*", schema: "public", table: "quote_taxonomy"}, () => loadTaxo())
     .subscribe();
 }
 function showLogin(msg){ $("appView").hidden = true; $("loginView").hidden = false; if (msg != null) $("lg-status").textContent = msg; }

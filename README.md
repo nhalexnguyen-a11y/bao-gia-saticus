@@ -27,6 +27,7 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `supabase/schema.sql` – tạo 2 bảng và chính sách RLS (đã chạy)
 - `supabase/seed.sql` – dữ liệu ban đầu: cài đặt công ty, máy LW230H (đã chạy)
 - `supabase/002_nhap_lieu.sql` – trạng thái duyệt, đoạn mẫu dùng chung, hộp thư nhập liệu
+- `supabase/003_danh_muc.sql` – danh mục dòng máy và hãng
 - `CLAUDE.md` – quy trình Claude xử lý hộp thư
 
 ## Nhập model
@@ -44,3 +45,7 @@ Thêm từ bản nâng cấp nhập liệu:
 ## Hộp thư nhập liệu
 
 Gửi catalog PDF (ứng dụng chỉ trích phần chữ trên trình duyệt, không tải file lên) hoặc dán nội dung. Nhắn Claude "xử lý hộp thư báo giá"; Claude tạo model **Chờ duyệt**. Model chờ duyệt không chọn được để báo giá cho tới khi có người mở ra và bấm **Duyệt và lưu**.
+
+## Dòng máy & hãng
+
+Danh mục tạo riêng ở trang **Dòng máy & hãng**: thêm, đổi tên (cập nhật luôn các model đang dùng), xóa (chỉ khi chưa có model nào dùng). Khi thêm model hoặc gửi catalog vào hộp thư, người dùng chọn dòng máy và hãng từ danh mục; không gõ tự do. Dòng máy chưa có model vẫn hiện trong bộ lọc thư viện.
