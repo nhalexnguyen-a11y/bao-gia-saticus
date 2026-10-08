@@ -258,7 +258,6 @@ details.box[open] summary{margin-bottom:10px}
 .scope-q .it span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scope-q .it label{display:inline;font-weight:400;color:var(--text);font-size:13.5px}
 .scope-q .it input.num{padding:5px 8px}
-.scope-q .lbl{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding-top:4px}
 .tchips{display:flex;flex-wrap:wrap;gap:8px}
 .tchip{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;min-height:36px;max-width:100%;padding:7px 14px;border-radius:999px;border:1.5px solid var(--btn-border);font-size:13.5px;color:var(--muted);cursor:pointer;transition:transform .12s ease,border-color .15s ease,color .15s ease}
 .tchip:active{transform:scale(.97)}
@@ -341,7 +340,6 @@ details.box[open] summary{margin-bottom:10px}
 .sitem input,.sitem textarea{background:var(--card)}
 .sitem .top{display:grid;grid-template-columns:minmax(0,1fr) 84px auto;gap:8px;align-items:end}
 .sitem.lbl textarea{font-weight:700}
-.optck{flex-direction:row;align-items:center;gap:8px;font-weight:500;color:var(--muted);font-size:13px}
 .pastebox,.subbox{display:flex;flex-direction:column;gap:10px;border-radius:14px;padding:14px;background:var(--card-2)}
 .subbox h3{margin:0;font-size:14px;font-weight:700}
 .subbox input,.subbox textarea{background:var(--card)}
@@ -652,11 +650,10 @@ details.box[open] summary{margin-bottom:10px}
 
         <div class="panel">
           <div class="h2row"><h2>Cấu hình tiêu chuẩn</h2><span class="count" id="p-scopeStat"></span></div>
-          <p class="hint">Mỗi mục một khung. Mục để trống SL là dòng nhãn nhóm in đậm (VD: "Phụ Kiện Rửa:").</p>
+          <p class="hint">Mỗi mục một khung. Các mục này luôn có trong báo giá (sales vẫn bỏ tick được khi cần).</p>
           <div class="scope-ed" id="p-scope"></div>
           <div class="btns">
             <button class="btn sm" type="button" id="p-addScope">+ Thêm mục</button>
-            <button class="btn sm" type="button" id="p-addLabel">+ Thêm nhãn nhóm</button>
             <button class="btn sm" type="button" id="p-pasteOpen">Dán từ Excel</button>
             <button class="btn sm" type="button" id="p-sSnipOpen" aria-expanded="false">Mục mẫu</button>
           </div>
@@ -667,6 +664,13 @@ details.box[open] summary{margin-bottom:10px}
             </label>
             <div class="btns"><button class="btn sm primary" type="button" id="p-pasteAdd">Thêm vào danh sách</button><button class="btn sm ghost" type="button" id="p-pasteClose">Đóng</button></div>
           </div>
+        </div>
+
+        <div class="panel">
+          <div class="h2row"><h2>Tùy chọn</h2><span class="count" id="p-optStat"></span></div>
+          <p class="hint">Mục bán thêm. Khi báo giá mặc định không tick; khách cần thì sales tick vào, mục đó in dưới tiêu đề "Tùy chọn".</p>
+          <div class="scope-ed" id="p-opt"></div>
+          <div class="btns"><button class="btn sm" type="button" id="p-addOpt">+ Thêm mục tùy chọn</button></div>
         </div>
 
         <div class="panel" id="p-checksPanel">
@@ -874,10 +878,10 @@ function rowHeight(text, widthChars, pt){
 function itemBody(p, scope){
   const body = [];
   (p.sections||[]).forEach(s => { if (s.title) body.push({type: "head", text: heading(s.title)}); (s.lines||[]).forEach(l => body.push({type: "line", text: bullet(l)})); });
-  if (scope.length) {
-    body.push({type: "head", text: "CẤU HÌNH TIÊU CHUẨN"});
-    scope.forEach(it => body.push(it.qty === "" || it.qty == null ? {type: "head", text: it.text} : {type: "scope", text: bullet(it.text), code: it.code, qty: it.qty}));
-  }
+  const row = it => ({type: "scope", text: bullet(it.text), code: it.code, qty: it.qty ?? ""});
+  const std = scope.filter(it => !it.opt), opt = scope.filter(it => it.opt);
+  if (std.length) { body.push({type: "head", text: "CẤU HÌNH TIÊU CHUẨN"}); std.forEach(it => body.push(row(it))); }
+  if (opt.length) { body.push({type: "head", text: "TÙY CHỌN"}); opt.forEach(it => body.push(row(it))); }
   return body;
 }
 /* logo = {base64: "data:image/png;base64,...", w, h} hoặc null */
@@ -1137,7 +1141,7 @@ function keySpecs(p){
   if (out.length < 2) {
     if (p.origin && out.length < 4) out.push({k: "Xuất xứ", v: p.origin});
     out.push({k: "Mô tả kỹ thuật", v: (p.sections || []).filter(s => s.title).length + " mục"});
-    if ((p.scope || []).length) out.push({k: "Cấu hình tiêu chuẩn", v: (p.scope || []).filter(x => !isLabel(x)).length + " mục"});
+    if ((p.scope || []).length) out.push({k: "Cấu hình tiêu chuẩn", v: (p.scope || []).filter(x => !x.opt).length + " mục"});
   }
   return out.slice(0, 4);
 }
@@ -1205,7 +1209,6 @@ $("sel-clear").addEventListener("click", () => { selected = []; LS.set("bg_sel",
 $("sel-go").addEventListener("click", () => { openQuote(); });
 
 /* ---------- Tạo báo giá ---------- */
-const isLabel = it => it.qty === "" || it.qty == null;
 function lineFor(p){
   let ln = lines[p.id];
   const sc = p.scope || [];
@@ -1216,11 +1219,8 @@ function lineFor(p){
 function currentItems(){
   return selected.map(id => products.get(id)).filter(p => p && !isDraft(p)).map(p => {
     const ln = lineFor(p);
-    const sc = p.scope || [];
-    /* Nhãn nhóm chỉ in khi trong nhóm còn ít nhất một mục được tick (nhãn không có mục nào phía sau thì giữ nguyên) */
-    const groupHasItem = i => { let any = false, j = i + 1; for (; j < sc.length && !isLabel(sc[j]); j++) if (ln.scope[j].include) return true; return j === i + 1 ? true : any; };
-    const scope = sc.map((it, i) => ({it, s: ln.scope[i], i})).filter(x => isLabel(x.it) ? groupHasItem(x.i) : x.s.include)
-      .map(x => ({code: x.it.code || "", text: x.it.text || "", qty: isLabel(x.it) ? "" : x.s.qty}));
+    const scope = (p.scope || []).map((it, i) => ({it, s: ln.scope[i]})).filter(x => x.s.include)
+      .map(x => ({code: x.it.code || "", text: x.it.text || "", qty: x.s.qty, opt: !!x.it.opt}));
     return {p, qty: ln.qty, price: ln.price, scope};
   });
 }
@@ -1316,7 +1316,7 @@ function renderItems(){
   }
   items.forEach((p, idx) => {
     const ln = lineFor(p), d = document.createElement("div"); d.className = "qitem";
-    const nScope = (p.scope||[]).filter(x => !isLabel(x)).length;
+    const nScope = (p.scope||[]).filter(x => !x.opt).length, nOpt = (p.scope||[]).filter(x => x.opt).length;
     d.innerHTML = `<div class="hd"><span class="ic">${ICON_MACHINE}</span>
         <div style="min-width:0"><div class="nm">${esc(p.model || p.name)}</div><div class="sub">${esc([p.name, p.maker].filter(Boolean).join(" · "))} · Cấu hình tiêu chuẩn</div></div>
         <button class="btn sm ghost danger" type="button" data-a="rm" aria-label="Bỏ ${esc(p.model || p.name)} khỏi báo giá">Bỏ</button></div>
@@ -1324,16 +1324,16 @@ function renderItems(){
         <label for="qi-p-${idx}"><span>Đơn giá chưa VAT <span class="req" aria-hidden="true">*</span></span><span class="money"><input id="qi-p-${idx}" inputmode="numeric" placeholder="0" aria-required="true" value="${ln.price ? vnd(num(ln.price)) : ""}"><span>VNĐ</span></span></label>
         <label for="qi-q-${idx}">Số lượng<input id="qi-q-${idx}" class="num" inputmode="numeric" value="${esc(ln.qty)}"></label>
       </div>
-      ${nScope ? `<details class="box"><summary>Cấu hình tiêu chuẩn (${nScope} mục)</summary><div class="scope-q"></div></details>` : ""}`;
+      ${nScope ? `<details class="box"><summary>Cấu hình tiêu chuẩn (${nScope} mục)</summary><div class="scope-q" data-k="std"></div></details>` : ""}
+      ${nOpt ? `<details class="box opt" open><summary>Tùy chọn (${nOpt} mục) · tick mục khách cần</summary><div class="scope-q" data-k="opt"></div></details>` : ""}`;
     d.querySelector(`#qi-q-${idx}`).addEventListener("input", e => { ln.qty = e.target.value; refreshQuote(); });
     liveMoney(d.querySelector(`#qi-p-${idx}`), n => { ln.price = n; refreshQuote(); });
     d.querySelector('[data-a="rm"]').addEventListener("click", () => { selected = selected.filter(x => x !== p.id); LS.set("bg_sel", selected); renderItems(); refreshQuote(); });
-    const sq = d.querySelector(".scope-q");
-    if (sq) (p.scope||[]).forEach((it, i) => {
+    (p.scope||[]).forEach((it, i) => {
+      const sq = d.querySelector(`.scope-q[data-k="${it.opt ? "opt" : "std"}"]`); if (!sq) return;
       const first = (it.text || "").split("\n")[0];
-      if (isLabel(it)) { const l = document.createElement("div"); l.className = "lbl"; l.textContent = first; sq.appendChild(l); return; }
       const r = document.createElement("div"); r.className = "it";
-      r.innerHTML = `<input type="checkbox" id="qs-${idx}-${i}" ${ln.scope[i].include ? "checked" : ""}><span title="${esc(it.text)}"><label for="qs-${idx}-${i}">${it.code ? "<b>" + esc(it.code) + "</b> · " : ""}${esc(first)}${it.opt ? ' <span class="chip">tùy chọn</span>' : ""}</label></span><input class="num" aria-label="Số lượng ${esc(first)}" value="${esc(ln.scope[i].qty)}">`;
+      r.innerHTML = `<input type="checkbox" id="qs-${idx}-${i}" ${ln.scope[i].include ? "checked" : ""}><span title="${esc(it.text)}"><label for="qs-${idx}-${i}">${it.code ? "<b>" + esc(it.code) + "</b> · " : ""}${esc(first)}</label></span><input class="num" aria-label="Số lượng ${esc(first)}" value="${esc(ln.scope[i].qty)}">`;
       r.querySelector("input[type=checkbox]").addEventListener("change", e => { ln.scope[i].include = e.target.checked; refreshQuote(); });
       r.querySelector("input.num").addEventListener("input", e => { ln.scope[i].qty = e.target.value; refreshQuote(); });
       sq.appendChild(r);
@@ -1485,7 +1485,7 @@ function canonical(value, field){
 }
 function readEditor(){
   const scope = edScope.filter(it => String(it.text).trim() || String(it.code).trim())
-    .map(it => { const o = {code: norm(it.code), text: String(it.text).replace(/\s+$/, "").replace(/^\s+/, ""), qty: String(it.qty ?? "").trim()}; if (it.opt && !isLabel(o)) o.opt = true; return o; });
+    .map(it => { const o = {code: norm(it.code), text: String(it.text).replace(/\s+$/, "").replace(/^\s+/, ""), qty: String(it.qty ?? "").trim()}; if (it.opt) o.opt = true; return o; });
   return {name: canonical($("p-name").value, "name"), maker: canonical($("p-maker").value, "maker"), model: norm($("p-model").value),
     code: norm($("p-code").value), origin: canonical($("p-origin").value, "origin"), sections: parseBody($("p-body").value), scope};
 }
@@ -1560,8 +1560,8 @@ function afterEdit(dirty = true){
   scheduleChecks(); updateSkelHint();
   const secs = parseBody($("p-body").value);
   $("p-bodyStat").textContent = secs.filter(s => s.title).length + " mục · " + secs.reduce((a, s) => a + s.lines.length, 0) + " dòng";
-  const n = edScope.filter(x => !isLabel(x) && String(x.text).trim()).length, nl = edScope.filter(x => isLabel(x) && String(x.text).trim()).length;
-  $("p-scopeStat").textContent = n + " mục" + (nl ? " · " + nl + " nhãn" : "");
+  const n = edScope.filter(x => !x.opt && String(x.text).trim()).length, no = edScope.filter(x => x.opt && String(x.text).trim()).length;
+  $("p-scopeStat").textContent = n + " mục"; $("p-optStat").textContent = no + " mục";
   checkDup(); renderEdPreview();
 }
 ["p-name","p-maker","p-model","p-code","p-origin","p-body"].forEach(id => $(id).addEventListener("input", () => afterEdit()));
@@ -1589,25 +1589,27 @@ function renderEdPreview(){
 
 /* Cấu hình tiêu chuẩn */
 function renderEdScope(){
-  const box = $("p-scope"); box.innerHTML = "";
-  if (!edScope.length) box.innerHTML = `<p class="hint">Chưa có mục nào.</p>`;
+  const boxes = {std: $("p-scope"), opt: $("p-opt")};
+  Object.entries(boxes).forEach(([k, b]) => { b.innerHTML = edScope.some(x => !!x.opt === (k === "opt")) ? "" : `<p class="hint">Chưa có mục nào.</p>`; });
+  /* vị trí lên/xuống tính trong cùng phần (tiêu chuẩn hoặc tùy chọn) */
+  const sib = (i, dir) => { for (let j = i + dir; j >= 0 && j < edScope.length; j += dir) if (!!edScope[j].opt === !!edScope[i].opt) return j; return -1; };
   edScope.forEach((it, i) => {
-    const d = document.createElement("div"); d.className = "sitem" + (isLabel(it) ? " lbl" : "");
+    const box = it.opt ? boxes.opt : boxes.std;
+    const d = document.createElement("div"); d.className = "sitem";
     d.innerHTML = `<div class="top"><label for="ps-c${i}">Mã số<input id="ps-c${i}" value="${esc(it.code)}"></label>
-        <label for="ps-q${i}">SL<input id="ps-q${i}" class="num" value="${esc(it.qty)}" placeholder="nhãn"></label>
+        <label for="ps-q${i}">SL<input id="ps-q${i}" class="num" value="${esc(it.qty)}" ></label>
         <div class="btns"><button type="button" class="btn sm" data-a="up" aria-label="Chuyển lên">↑</button><button type="button" class="btn sm" data-a="down" aria-label="Chuyển xuống">↓</button><button type="button" class="btn sm" data-a="copy">Sao chép</button><button type="button" class="btn sm danger" data-a="del">Xóa</button></div></div>
-      <label for="ps-t${i}">${isLabel(it) ? "Nhãn nhóm (in đậm)" : "Mô tả"}<textarea id="ps-t${i}" rows="${Math.min(6, Math.max(1, String(it.text).split("\n").length))}">${esc(it.text)}</textarea></label>
-      ${isLabel(it) ? "" : `<label class="optck" for="ps-o${i}"><input type="checkbox" id="ps-o${i}" ${it.opt ? "checked" : ""}>Tùy chọn: khi báo giá mặc định không tick, sales tick nếu khách lấy</label>`}`;
+      <label for="ps-t${i}">Mô tả<textarea id="ps-t${i}" rows="${Math.min(6, Math.max(1, String(it.text).split("\n").length))}">${esc(it.text)}</textarea></label>
+      <div class="btns"><button type="button" class="btn sm ghost" data-a="move">${it.opt ? "Chuyển sang Cấu hình tiêu chuẩn" : "Chuyển sang Tùy chọn"}</button></div>`;
     d.querySelector(`#ps-c${i}`).addEventListener("input", e => { it.code = e.target.value; afterEdit(); });
-    d.querySelector(`#ps-q${i}`).addEventListener("input", e => { const was = isLabel(it); it.qty = e.target.value.trim(); afterEdit(); if (was !== isLabel(it)) { d.classList.toggle("lbl", isLabel(it)); } });
+    d.querySelector(`#ps-q${i}`).addEventListener("input", e => { it.qty = e.target.value.trim(); afterEdit(); });
     d.querySelector(`#ps-t${i}`).addEventListener("input", e => { it.text = e.target.value; afterEdit(); });
-    const oc = d.querySelector(`#ps-o${i}`); if (oc) oc.addEventListener("change", e => { it.opt = e.target.checked; afterEdit(); });
     d.querySelectorAll("button[data-a]").forEach(b => b.addEventListener("click", () => {
       const a = b.dataset.a;
       if (a === "del") edScope.splice(i, 1);
       if (a === "copy") edScope.splice(i + 1, 0, {...it});
-      if (a === "up" && i > 0) [edScope[i-1], edScope[i]] = [edScope[i], edScope[i-1]];
-      if (a === "down" && i < edScope.length - 1) [edScope[i+1], edScope[i]] = [edScope[i], edScope[i+1]];
+      if (a === "up" || a === "down") { const j = sib(i, a === "up" ? -1 : 1); if (j >= 0) [edScope[j], edScope[i]] = [edScope[i], edScope[j]]; }
+      if (a === "move") { edScope.splice(i, 1); const o = !it.opt; if (o) it.opt = true; else delete it.opt; edScope.push(it); }
       renderEdScope(); afterEdit();
     }));
     box.appendChild(d);
@@ -1615,7 +1617,7 @@ function renderEdScope(){
 }
 function addScope(item){ edScope.push(item); renderEdScope(); afterEdit(); const t = $("ps-t" + (edScope.length - 1)); if (t) t.focus(); }
 $("p-addScope").addEventListener("click", () => addScope({code: "", text: "", qty: "1"}));
-$("p-addLabel").addEventListener("click", () => addScope({code: "", text: "", qty: ""}));
+$("p-addOpt").addEventListener("click", () => addScope({code: "", text: "", qty: "1", opt: true}));
 $("p-pasteOpen").addEventListener("click", () => { $("p-pasteBox").hidden = false; $("p-paste").focus(); });
 $("p-pasteClose").addEventListener("click", () => { $("p-pasteBox").hidden = true; });
 
@@ -1754,13 +1756,14 @@ function parseQuoteWorkbook(wb){
         if (STOP.test(x.a) || STOP.test(c)) break;
         if (!c && !x.b) continue;
         if (SCOPE_START.test(c)) { mode = "scope"; continue; }
+        if (mode === "scope" && /^(tùy|tuỳ) chọn\s*:?$/i.test(c)) { mode = "opt"; continue; }
         if (mode === "desc") {
           if (x.cBold && !c.includes("\n") && c.length <= 120) { cur = {title: c, lines: []}; p.sections.push(cur); continue; }
           if (!cur) { cur = {title: "", lines: []}; p.sections.push(cur); }
           c.split("\n").map(s => s.trim()).filter(Boolean).forEach(s => cur.lines.push(s));
         } else {
           const qty = x.d && !/^0$/.test(x.d) ? x.d : "";
-          p.scope.push({code: x.b, text: c.replace(/^\s*-\s+/, ""), qty: qty});
+          p.scope.push(Object.assign({code: x.b, text: c.replace(/^\s*-\s+/, ""), qty: qty}, mode === "opt" ? {opt: true} : {}));
         }
       }
       found.push(p);
@@ -1772,7 +1775,7 @@ function useImported(p){
   editingId = null; $("p-title").textContent = "Thêm máy (từ file Excel)"; $("p-del").hidden = true; $("p-dup").hidden = true; setReviewUI(null);
   fillEditor(p); edDirty = true; saveDraft();
   const missing = [["Dòng máy", p.name], ["Hãng", p.maker], ["Model", p.model], ["Xuất xứ", p.origin]].filter(x => !x[1]).map(x => x[0]);
-  const ns = p.sections.filter(s => s.title).length, nc = p.scope.filter(s => !isLabel(s)).length;
+  const ns = p.sections.filter(s => s.title).length, nc = p.scope.length;
   const notIn = [["Dòng máy", "p-name"], ["Hãng", "p-maker"]].filter(([, id]) => $(id).value && !inTaxo(SEL[id], $(id).value)).map(([l, id]) => l + " \"" + $(id).value + "\"");
   $("p-xlsxStatus").className = missing.length || notIn.length ? "status err" : "status ok";
   $("p-xlsxStatus").textContent = "Đã đọc " + ns + " mục mô tả, " + nc + " mục cấu hình." + (missing.length ? " Còn trống: " + missing.join(", ") + "." : "")
@@ -1926,7 +1929,6 @@ function runChecks(){
   edScope.forEach((it, i) => {
     const t = String(it.text || "").trim(), c = String(it.code || "").trim(), q = String(it.qty ?? "").trim();
     if (!t) { if (c) add("warn", "Mục cấu hình có mã " + c + " nhưng chưa có mô tả", {scope: i}); return; }
-    if (isLabel(it) && c) add("warn", "Nhãn nhóm lại có mã số, có thể quên nhập SL", {scope: i, text: t});
     if (q && !/^\d+([.,]\d+)?$/.test(q)) add("info", "SL không phải số: " + q, {scope: i, text: t});
     if (looksEnglish(t)) add("warn", "Mục cấu hình có vẻ chưa dịch", {scope: i, text: t});
   });
@@ -2120,7 +2122,7 @@ function commonScope(){
     if (p.id === editingId) return;
     const done = new Set();
     (p.scope||[]).forEach(it => {
-      if (isLabel(it) || !String(it.text).trim()) return;
+      if (!String(it.text).trim()) return;
       const k = key(it.text); if (done.has(k)) return; done.add(k);
       const e = map.get(k) || {it, n: 0}; e.n++; map.set(k, e);
     });
