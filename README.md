@@ -14,11 +14,19 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 
 ## Quyền
 
-| Vai trò trong Alex workspace | Thư viện máy | Cài đặt báo giá |
-|---|---|---|
-| super_admin, admin | Xem, thêm, sửa, xóa | Sửa |
-| manager, user, cto_coo | Xem, thêm, sửa, xóa | Xem |
-| Chưa đăng nhập | Không truy cập | Không truy cập |
+Theo cấp của GOR (`profiles.role`). Cơ sở dữ liệu chặn bằng RLS và trigger (`supabase/007_phan_quyen.sql`), giao diện ẩn nút tương ứng.
+
+| Quyền | Super Admin | Admin | CTO/COO | Manager | User |
+|---|---|---|---|---|---|
+| Xem thư viện, tạo và xuất báo giá | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Thêm, sửa model | ✓ | ✓ | | ✓ (về chờ duyệt) | |
+| Duyệt model | ✓ | | | | |
+| Xóa model | ✓ | ✓ | | | |
+| Dòng máy & hãng | ✓ | ✓ | | | |
+| Cài đặt, điều khoản | ✓ | ✓ | | | |
+| Mục mẫu, đoạn mẫu | ✓ | ✓ | | ✓ | |
+
+Chưa đăng nhập: không truy cập.
 
 ## Cấu trúc
 
@@ -31,6 +39,7 @@ Trong dữ liệu: dòng máy = cột `name`, hãng = cột `maker`.
 - `supabase/004_hop_thu_super_admin.sql` – khóa hộp thư cho Super Admin (hộp thư đã gỡ khỏi ứng dụng)
 - `supabase/005_duyet_super_admin.sql` – chỉ Super Admin duyệt model
 - `supabase/006_xoa_hop_thu.sql` – xóa bảng hộp thư
+- `supabase/007_phan_quyen.sql` – phân quyền theo cấp GOR
 - `CLAUDE.md` – ghi chú cho Claude
 
 ## Nhập model
@@ -47,7 +56,7 @@ Thêm từ bản nâng cấp nhập liệu:
 
 ## Model chờ duyệt
 
-Model do Claude tạo từ catalog (gửi file trong chat) ở trạng thái **Chờ duyệt**: không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu**. Tài khoản khác vẫn sửa được nhưng không duyệt được (cơ sở dữ liệu cũng chặn).
+Model do Claude tạo từ catalog (gửi file trong chat) ở trạng thái **Chờ duyệt**: không chọn được để báo giá cho tới khi Super Admin mở ra và bấm **Duyệt và lưu**. Admin và Manager sửa được nhưng không duyệt được (cơ sở dữ liệu cũng chặn).
 
 (Tính năng Hộp thư nhập liệu đã gỡ khỏi ứng dụng và bảng `quote_inbox` đã xóa.)
 
