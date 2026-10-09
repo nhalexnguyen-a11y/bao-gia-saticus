@@ -19,12 +19,14 @@ Theo cấp của GOR (`profiles.role`). Cơ sở dữ liệu chặn bằng RLS v
 | Quyền | Super Admin | Admin | CTO/COO | Manager | User |
 |---|---|---|---|---|---|
 | Xem thư viện, tạo và xuất báo giá | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Thêm, sửa model | ✓ | ✓ | | ✓ (về chờ duyệt) | |
+| Thêm, sửa model | ✓ | ✓ | ✓ | ✓ (về chờ duyệt) | |
 | Duyệt model | ✓ | | | | |
-| Xóa model | ✓ | ✓ | | | |
-| Dòng máy & hãng | ✓ | ✓ | | | |
-| Cài đặt, điều khoản | ✓ | ✓ | | | |
-| Mục mẫu, đoạn mẫu | ✓ | ✓ | | ✓ | |
+| Xóa model | ✓ | ✓ | ✓ | | |
+| Dòng máy & hãng | ✓ | ✓ | ✓ | | |
+| Cài đặt, điều khoản | ✓ | ✓ | ✓ | | |
+| Mục mẫu, đoạn mẫu | ✓ | ✓ | ✓ | ✓ | |
+
+CTO/COO có quyền như Admin chỉ trong thư viện báo giá (`supabase/008_cto_coo_nhu_admin.sql`); quyền trong GOR không đổi.
 
 Chưa đăng nhập: không truy cập.
 
@@ -40,6 +42,7 @@ Chưa đăng nhập: không truy cập.
 - `supabase/005_duyet_super_admin.sql` – chỉ Super Admin duyệt model
 - `supabase/006_xoa_hop_thu.sql` – xóa bảng hộp thư
 - `supabase/007_phan_quyen.sql` – phân quyền theo cấp GOR
+- `supabase/008_cto_coo_nhu_admin.sql` – CTO/COO có quyền như Admin trong thư viện báo giá
 - `CLAUDE.md` – ghi chú cho Claude
 
 ## Nhập model

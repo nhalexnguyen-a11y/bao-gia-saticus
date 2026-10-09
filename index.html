@@ -2353,7 +2353,7 @@ function fillSettings(){
   $("s-vat").value = settings.vat; $("s-terms").value = settings.terms;
   const ro = !canAdmin; document.querySelectorAll("#setForm input,#setForm textarea").forEach(el => el.readOnly = ro);
   TERMS["s-termsEd"].ro = ro; TERMS["s-termsEd"].load();
-  $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ Admin hoặc Super Admin sửa được cài đặt." : "";
+  $("s-save").hidden = ro; $("s-status").textContent = ro ? "Chỉ Super Admin, Admin hoặc CTO/COO sửa được cài đặt." : "";
 }
 $("setForm").addEventListener("submit", async e => {
   e.preventDefault(); const s = $("s-status");
@@ -2390,9 +2390,9 @@ async function loadSettings(){
 
 /* ---------- Phân quyền theo cấp GOR (cơ sở dữ liệu cũng chặn, xem supabase/007_phan_quyen.sql) ----------
    Mọi tài khoản: xem, tạo và xuất báo giá. Super Admin, Admin, Manager: thêm/sửa model, mục mẫu.
-   Super Admin, Admin: xóa model, dòng máy & hãng, cài đặt. Chỉ Super Admin duyệt. Manager lưu thì về chờ duyệt. */
+   Super Admin, Admin, CTO/COO: xóa model, dòng máy & hãng, cài đặt. Chỉ Super Admin duyệt. Manager lưu thì về chờ duyệt. */
 function setRole(role){
-  myRole = role || ""; isSuper = myRole === "super_admin"; canAdmin = isSuper || myRole === "admin"; canEdit = canAdmin || myRole === "manager";
+  myRole = role || ""; isSuper = myRole === "super_admin"; canAdmin = isSuper || myRole === "admin" || myRole === "cto_coo"; canEdit = canAdmin || myRole === "manager";
   document.body.classList.toggle("can-edit", canEdit); document.body.classList.toggle("can-admin", canAdmin);
 }
 /* ---------- Đăng nhập ---------- */
