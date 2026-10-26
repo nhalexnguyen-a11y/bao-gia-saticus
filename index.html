@@ -13,17 +13,20 @@
 (function(){ var t = "light"; try { t = localStorage.getItem("qlcv_theme") === "dark" ? "dark" : "light"; } catch (e) {} document.documentElement.setAttribute("data-theme", t); })();
 </script>
 <style>
-/* Giao diện đồng bộ với GOR: dùng đúng token màu, font hệ thống, sidebar 232px, theme sáng/tối (qlcv_theme).
-   Đơn sắc đen trắng, mỗi màn hình chỉ một khối nền đảo màu. */
+/* Giao diện đồng bộ với Alexios (trước là GOR): token màu xanh SatiCus + điểm nhấn cam, font hệ thống,
+   sidebar xanh, theme sáng/tối dùng chung khóa qlcv_theme. */
 :root{
   color-scheme:light;
-  --bg:#f2f2f4; --card:#ffffff; --card-2:#f7f7f8; --border:#e7e7ea; --btn-border:#e2e2e6; --btn-hover:#f2f2f4;
-  --text:#131315; --muted:#75757e; --ink:#0c0c0e; --ink-hover:#000000; --ink-soft:#333338;
+  --bg:#f1f5fa; --card:#ffffff; --card-2:#f5f8fc; --border:#dfe6ef; --btn-border:#d5dfeb; --btn-hover:#eaf1f9;
+  --text:#0f1f36; --muted:#5f6f86; --ink:#08509c; --ink-hover:#063f7c; --ink-soft:#1f5aa6; --on-ink:#ffffff;
   --green:#1f7a4d; --green-bg:#e6f4ec; --orange:#956a17; --orange-bg:#f8efdd; --red:#c23f34; --red-bg:#fbeae8;
-  --row-hover:#fafafb; --track-bg:#ececef; --badge-gray-bg:#ececef;
-  --sidebar-bg:#ffffff; --sidebar-text:#6b6b73; --sidebar-text-strong:#0c0c0e; --sidebar-active:#f2f2f4;
-  --shadow-card:0 1px 3px rgba(20,20,30,.05),0 1px 2px rgba(20,20,30,.04);
-  --shadow-lg:0 10px 30px rgba(20,20,30,.08),0 2px 8px rgba(20,20,30,.05);
+  --row-hover:#f5f9fd; --track-bg:#e3eaf3; --badge-gray-bg:#e7edf5; --blue-bg:#eaf1f9;
+  --sidebar-bg:#08509c; --sidebar-text:#c9daf0; --sidebar-text-strong:#ffffff; --sidebar-active:rgba(255,255,255,.14);
+  --sc-brand:#08509c; --sc-brand-2:#1f5aa6; --sc-orange:#f9a71f; --sc-orange-text:#a86a00;
+  --side-grad:linear-gradient(#08509c 0%,#0a4486 60%,#073a74 100%);
+  --hero-grad:linear-gradient(135deg,#08509c 0%,#0b63bf 100%);
+  --shadow-card:0 1px 3px rgba(8,40,90,.06),0 1px 2px rgba(8,40,90,.04);
+  --shadow-lg:0 10px 30px rgba(8,40,90,.10),0 2px 8px rgba(8,40,90,.06);
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   /* Màu của tờ báo giá in ra (giống file Excel), chỉ dùng trong bản in, không phải màu giao diện */
@@ -32,12 +35,15 @@
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0a0a0a; --card:#161613; --card-2:#1c1c19; --border:#2c2c28; --btn-border:#3a3a34; --btn-hover:#232320;
-  --text:#efeee8; --muted:#918f88; --ink:#ffffff; --ink-hover:#e6e6e0; --ink-soft:#d8d7d0;
+  --bg:#06111f; --card:#0c1c31; --card-2:#11243d; --border:#1c3350; --btn-border:#23406a; --btn-hover:#142b48;
+  --text:#e7eef8; --muted:#8c9db5; --ink:#5c9df0; --ink-hover:#7bb0f5; --ink-soft:#8db9f4; --on-ink:#06111f;
   --green:#74c49b; --green-bg:rgba(116,196,155,.14); --orange:#d9a95c; --orange-bg:rgba(217,169,92,.14); --red:#e88477; --red-bg:rgba(232,132,119,.14);
-  --row-hover:#1a1a17; --track-bg:#262622; --badge-gray-bg:#262622;
-  --sidebar-bg:#111110; --sidebar-text:#a5a49d; --sidebar-text-strong:#ffffff; --sidebar-active:#232320;
-  --shadow-card:0 1px 2px rgba(0,0,0,.3); --shadow-lg:0 8px 24px rgba(0,0,0,.35);
+  --row-hover:#0f2239; --track-bg:#162c47; --badge-gray-bg:#162c47; --blue-bg:rgba(92,157,240,.14);
+  --sidebar-bg:#071a31; --sidebar-text:#9fb4cf; --sidebar-text-strong:#ffffff; --sidebar-active:rgba(92,157,240,.18);
+  --sc-brand:#5c9df0; --sc-brand-2:#8db9f4; --sc-orange:#f9a71f; --sc-orange-text:#f6b94c;
+  --side-grad:linear-gradient(#082448 0%,#071a31 100%);
+  --hero-grad:linear-gradient(135deg,#0b4a92 0%,#1564c0 100%);
+  --shadow-card:0 1px 2px rgba(0,0,0,.35); --shadow-lg:0 8px 24px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -420,6 +426,48 @@ details.box[open] summary{margin-bottom:10px}
   .paper.mini{min-width:360px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.btn:active,.chip-f:active,.tchip:active{transform:none}.mcard:hover{transform:none}}
+
+/* ---------- Lớp giao diện Alexios (chỉ màu sắc và trang trí, không đổi bố cục hay nội dung) ---------- */
+/* Chữ trên nền xanh đậm: trắng ở theme sáng, xanh đen ở theme tối (như Alexios) */
+.gtile,.nav [aria-current="page"],.btn.primary,.btn[aria-pressed="true"],.chip-f[aria-pressed="true"],.step.cur,.toast{color:var(--on-ink)}
+.btn.primary:hover{background:var(--ink-hover);border-color:var(--ink-hover);opacity:1}
+/* Sidebar xanh gradient, chữ trắng, mục đang chọn có vạch cam bên trái */
+.side{background:var(--side-grad);border-right:none;--text:#ffffff;--muted:rgba(255,255,255,.70);--border:rgba(255,255,255,.14);--card:rgba(255,255,255,.10);--card-2:rgba(255,255,255,.10);--btn-hover:rgba(255,255,255,.18);--btn-border:rgba(255,255,255,.22);--badge-gray-bg:rgba(255,255,255,.16)}
+:root[data-theme="dark"] .side{border-right:1px solid #1c3350}
+.side .gtile{display:none}
+.side .brand{padding:4px 10px 26px}
+.side .brand b{position:relative;color:#fff;letter-spacing:.14em}
+.side .brand b::after{content:"";position:absolute;left:0;bottom:-8px;width:28px;height:3px;border-radius:2px;background:var(--sc-orange)}
+.side .brand small{margin-top:14px;color:rgba(255,255,255,.70)}
+.side .nav button,.side .nav a{color:rgba(255,255,255,.74)}
+.side .nav button:hover,.side .nav a:hover{background:rgba(255,255,255,.10);color:#fff}
+.side .nav [aria-current="page"],.side .nav [aria-current="page"]:hover{background:rgba(255,255,255,.16);color:#fff;box-shadow:inset 3px 0 0 var(--sc-orange)}
+.side .nav button:focus-visible,.side .nav a:focus-visible{outline-color:#fff}
+.side .me b{color:#fff}
+.side .badge{color:#fff}
+.side .btn{color:#fff;border-color:rgba(255,255,255,.32)}
+.side .btn:hover{background:rgba(255,255,255,.12)}
+/* Tiêu đề trang: dòng nhỏ màu cam, dòng phụ xanh nhạt */
+.eyebrow{color:var(--sc-orange-text)}
+.hero .dim{color:color-mix(in srgb,var(--sc-brand) 42%,var(--muted))}
+/* Khối nổi bật (tổng tiền báo giá, panel thương hiệu đăng nhập): gradient xanh + viền cam dưới */
+.total,.lg-brand{position:relative;overflow:hidden;background:var(--hero-grad);color:#fff}
+.total::after,.lg-brand::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--sc-orange)}
+.lg-brand .gtile.inv{background:#fff;color:var(--sc-brand)}
+:root[data-theme="dark"] .lg-brand .gtile.inv{color:#08509c}
+/* Thẻ, ô nhập, tiêu đề cột */
+.panel,.empty,.note,details.box{box-shadow:var(--shadow-card)}
+input,select,textarea{background:var(--card);border:1px solid var(--border)}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--border) 50%,var(--muted))}
+input:focus,select:focus,textarea:focus{border-color:var(--ink)}
+input[readonly],textarea[readonly]{background:var(--card-2)}
+.side input,.side select{background:var(--card)}
+/* Điện thoại: thanh tab dưới, mục đang chọn màu xanh thương hiệu */
+@media (max-width:860px){
+  .tabbar{background:color-mix(in srgb,var(--card) 88%,transparent);box-shadow:inset 0 3px 0 var(--sc-orange);border-top:none}
+  .tabbar button{color:var(--muted)}
+  .tabbar [aria-current="page"]{color:var(--sc-brand)}
+}
 body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!important}
 </style>
 </head>
@@ -427,7 +475,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
 
 <section class="login" id="loginView" hidden>
   <aside class="lg-brand" aria-label="Giới thiệu">
-    <div class="lg-logo"><span class="gtile inv" aria-hidden="true">G</span><div><b>GORDIAN</b><small>Thư viện báo giá · by Alex Nguyen</small></div></div>
+    <div class="lg-logo"><span class="gtile inv" aria-hidden="true">G</span><div><b>ALEXIOS</b><small>Thư viện báo giá · by Alex Nguyen</small></div></div>
     <div class="lg-hero">
       <h1>Nạp một lần.<br><span>Dùng cho mọi báo giá.</span></h1>
       <p>Thư viện máy dùng chung cho đội sales. Chọn máy, điền khách và giá, xuất báo giá Excel theo form SatiCus.</p>
@@ -466,7 +514,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
 
 <div id="appView" class="shell" hidden>
 <aside class="side" aria-label="Điều hướng">
-  <div class="brand"><span class="gtile" aria-hidden="true">G</span><div><b>GORDIAN</b><small>Thư viện báo giá</small></div></div>
+  <div class="brand"><span class="gtile" aria-hidden="true">G</span><div><b>ALEXIOS</b><small>Thư viện báo giá</small></div></div>
   <nav class="nav">
     <button type="button" id="nav-lib" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></svg><span>Thư viện</span></button>
     <button type="button" id="nav-quote"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/></svg><span>Tạo báo giá</span></button>
