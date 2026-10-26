@@ -453,8 +453,12 @@ details.box[open] summary{margin-bottom:10px}
 /* Khối nổi bật (tổng tiền báo giá, panel thương hiệu đăng nhập): gradient xanh + viền cam dưới */
 .total,.lg-brand{position:relative;overflow:hidden;background:var(--hero-grad);color:#fff}
 .total::after,.lg-brand::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--sc-orange)}
-.lg-brand .gtile.inv{background:#fff;color:var(--sc-brand)}
-:root[data-theme="dark"] .lg-brand .gtile.inv{color:#08509c}
+/* Logo Alexios: chữ ALEXIOS + gạch cam, không dùng ô chữ G */
+.lg-brand .gtile{display:none}
+.lg-logo b{position:relative;font-size:20px;color:#fff}
+.lg-logo b::after{content:"";position:absolute;left:0;bottom:-8px;width:28px;height:3px;border-radius:2px;background:var(--sc-orange)}
+.lg-logo small{margin-top:14px;opacity:.75}
+.lg-watermark{font-family:var(--font);font-weight:800;opacity:.07}
 /* Thẻ, ô nhập, tiêu đề cột */
 .panel,.empty,.note,details.box{box-shadow:var(--shadow-card)}
 input,select,textarea{background:var(--card);border:1px solid var(--border)}
@@ -475,7 +479,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
 
 <section class="login" id="loginView" hidden>
   <aside class="lg-brand" aria-label="Giới thiệu">
-    <div class="lg-logo"><span class="gtile inv" aria-hidden="true">G</span><div><b>ALEXIOS</b><small>Thư viện báo giá · by Alex Nguyen</small></div></div>
+    <div class="lg-logo"><span class="gtile inv" aria-hidden="true">A</span><div><b>ALEXIOS</b><small>Thư viện báo giá · by Alex Nguyen</small></div></div>
     <div class="lg-hero">
       <h1>Nạp một lần.<br><span>Dùng cho mọi báo giá.</span></h1>
       <p>Thư viện máy dùng chung cho đội sales. Chọn máy, điền khách và giá, xuất báo giá Excel theo form SatiCus.</p>
@@ -485,7 +489,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
       <li><b>Xuất Excel</b><span>Đúng form báo giá SatiCus</span></li>
       <li><b>Tài khoản GOR</b><span>Dùng chung đăng nhập và phân quyền</span></li>
     </ul>
-    <span class="lg-watermark" aria-hidden="true">G</span>
+    <span class="lg-watermark" aria-hidden="true">A</span>
   </aside>
   <div class="lg-main">
     <div class="lg-top"><button class="btn sm icon theme-btn" type="button" title="Dark / Light" aria-label="Đổi giao diện sáng hoặc tối">☾</button></div>
@@ -514,7 +518,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
 
 <div id="appView" class="shell" hidden>
 <aside class="side" aria-label="Điều hướng">
-  <div class="brand"><span class="gtile" aria-hidden="true">G</span><div><b>ALEXIOS</b><small>Thư viện báo giá</small></div></div>
+  <div class="brand"><span class="gtile" aria-hidden="true">A</span><div><b>ALEXIOS</b><small>Thư viện báo giá</small></div></div>
   <nav class="nav">
     <button type="button" id="nav-lib" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></svg><span>Thư viện</span></button>
     <button type="button" id="nav-quote"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/></svg><span>Tạo báo giá</span></button>
