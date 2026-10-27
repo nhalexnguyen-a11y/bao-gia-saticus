@@ -25,7 +25,9 @@ jobs:
       - name: Chuẩn bị thư mục site
         run: |
           mkdir _site
-          cp index.html config.js logo.png apple-touch-icon.png .nojekyll _site/
+          cp index.html config.js logo.png .nojekyll _site/
+          # Logo dùng chung với app Alexios: lấy bản mới nhất mỗi lần triển khai
+          curl -fsSL --retry 3 https://alex-workspace.pages.dev/alexios-logo.png -o _site/alexios-logo.png
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
