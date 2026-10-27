@@ -435,7 +435,8 @@ details.box[open] summary{margin-bottom:10px}
 .side{background:var(--side-grad);border-right:none;--text:#ffffff;--muted:rgba(255,255,255,.70);--border:rgba(255,255,255,.14);--card:rgba(255,255,255,.10);--card-2:rgba(255,255,255,.10);--btn-hover:rgba(255,255,255,.18);--btn-border:rgba(255,255,255,.22);--badge-gray-bg:rgba(255,255,255,.16)}
 :root[data-theme="dark"] .side{border-right:1px solid #1c3350}
 .side .brand{padding:4px 10px 26px}
-.side .brand b{color:#fff;letter-spacing:.14em}
+.side .brand{align-items:center;gap:14px}
+.side .brand b{color:#fff;letter-spacing:.14em;white-space:nowrap}
 .side .brand small{color:rgba(255,255,255,.70)}
 .side .nav button,.side .nav a{color:rgba(255,255,255,.74)}
 .side .nav button:hover,.side .nav a:hover{background:rgba(255,255,255,.10);color:#fff}
@@ -518,7 +519,7 @@ body:not(.can-edit) .need-edit,body:not(.can-admin) .need-admin{display:none!imp
 
 <div id="appView" class="shell" hidden>
 <aside class="side" aria-label="Điều hướng">
-  <div class="brand"><span class="alogo" aria-hidden="true"><img src="alexios-logo.png" alt=""></span><div><b>ALEXIOS</b><small>Thư viện báo giá</small></div></div>
+  <div class="brand"><span class="alogo" aria-hidden="true"><img src="alexios-logo.png" alt=""></span><b>ALEXIOS</b></div>
   <nav class="nav">
     <button type="button" id="nav-lib" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></svg><span>Thư viện</span></button>
     <button type="button" id="nav-quote"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/></svg><span>Tạo báo giá</span></button>
