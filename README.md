@@ -66,3 +66,9 @@ Model do Claude tạo từ catalog (gửi file trong chat) ở trạng thái **C
 ## Dòng máy & hãng
 
 Danh mục tạo riêng ở trang **Dòng máy & hãng**: thêm, đổi tên (cập nhật luôn các model đang dùng), xóa (chỉ khi chưa có model nào dùng). Khi thêm model hoặc gửi catalog vào hộp thư, người dùng chọn dòng máy và hãng từ danh mục; không gõ tự do. Dòng máy chưa có model vẫn hiện trong bộ lọc thư viện.
+
+## App nhật ký dịch vụ kỹ thuật (T-Alexios)
+
+- Thư mục `dich-vu/` – app riêng cho kỹ thuật ghi nhật ký khi đến khách (lắp đặt, bảo trì, sửa chữa, hiệu chuẩn), quản lý máy đã lắp và hạn bảo hành. Chạy tại đường dẫn `/dich-vu/` của site này.
+- Dùng chung đăng nhập và Supabase với Alex workspace; bảng riêng `svc_customers`, `svc_equipment`, `svc_visits` (`supabase/009_nhat_ky_dich_vu.sql`, đã chạy).
+- Cả nhóm xem chung; nhật ký chỉ người tạo hoặc Super Admin/Admin/Manager/CTO-COO sửa, xoá.
